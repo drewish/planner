@@ -1,8 +1,9 @@
 # Generate Time-Block Planner Pages
 
-I'm a big fan of [Cal Newport's Time-Block Planner](https://www.timeblockplanner.com)
-but I didn't like a few things and wanted to make my own version. So wrote this
-ruby script generate 8.5 x 11 PDFs with my take on it. You can take a look at a [sample week](sample.pdf).
+I'm a big fan of [Cal Newport's Time-Block Planner](https://www.timeblockplanner.com) but I didn't like 
+having unused weekend pages and got tired of writing in the dates so I wrote this script to generate
+my take on it. It generates a PDF with a week's worth of 8.5 x 11 inch pages. You can take a look at a
+[sample](sample.pdf) and see what you think.
 
 ## Installation
 
