@@ -2,29 +2,33 @@ require "prawn"
 require 'pry'
 require 'date'
 
+HOUR_LABELS = [nil, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, nil, nil]
+HOUR_COUNT = HOUR_LABELS.length
+COLUMN_COUNT = 5
 MEDIUM_COLOR = '666666'
-DARK_COLOR   = '222222'
+DARK_COLOR   = '000000'
 OSX_FONT_PATH = "/System/Library/Fonts/Supplemental/"
 
 def week_page sunday
   header_row_count = 2
-  body_row_count = 22
-  column_count = 5
+  body_row_count = HOUR_COUNT * 2
+  last_column = COLUMN_COUNT - 1
   last_row = header_row_count + body_row_count - 1
 
-  define_grid(columns: column_count, rows: header_row_count + body_row_count, gutter: 0)
+  define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
+  # grid.show_all
 
   # Header
   grid([0, 1],[0, 2]).bounding_box do
-    text "The Week Ahead", inline_format: true, color: DARK_COLOR, size: 20, align: :left
+    text "The Week Ahead", inline_format: true, size: 20, align: :left
   end
-  grid([0, 3],[0, 4]).bounding_box do
-    text sunday.strftime("Week %W"), color: MEDIUM_COLOR, size: 20, align: :right
+  grid([0, 3],[0, last_column]).bounding_box do
+    text sunday.strftime("Week <b>%W</b>"), inline_format: true, size: 20, align: :right
   end
 
   # Horizontal lines
   (1..last_row).each do |row|
-    grid([row, 1], [row, 4]).bounding_box do
+    grid([row, 1], [row, last_column]).bounding_box do
       stroke_line bounds.bottom_left, bounds.bottom_right
     end
   end
@@ -32,18 +36,17 @@ end
 
 def task_page date
   header_row_count = 2
-  body_row_count = 22
-  column_count = 5
+  body_row_count = HOUR_COUNT * 2
   last_row = header_row_count + body_row_count - 1
 
-  define_grid(columns: column_count, rows: header_row_count + body_row_count, gutter: 0)
+  define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
 
   # Header
   grid([0, 0],[1, 2]).bounding_box do
-    text date.strftime("Week %W"), color: MEDIUM_COLOR, size: 20, align: :left
+    text date.strftime("Week <b>%W</b>"), inline_format: true, size: 20, align: :left
   end
   grid([0, 2],[1, 3]).bounding_box do
-    text date.strftime("Day %j"), color: DARK_COLOR, size: 20, align: :right
+    text date.strftime("Day <b>%j</b>"), inline_format: true, size: 20, align: :right
   end
 
   # Daily metrics
@@ -94,21 +97,29 @@ end
 
 def time_page date
   header_row_count = 2
-  body_row_count = 22
-  column_count = 5
-  last_column = column_count - 1
+  body_row_count = HOUR_COUNT * 2
+  last_column = COLUMN_COUNT - 1
   fist_hour_row = header_row_count
   last_hour_row = header_row_count + body_row_count - 1
 
-  define_grid(columns: column_count, rows: header_row_count + body_row_count, gutter: 0)
+  define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
 
   # Header
   grid([0, 1],[1, 2]).bounding_box do
-    text date.strftime("<color rgb='#{DARK_COLOR}'>%B %-d</color>, %Y"), inline_format: true, color: MEDIUM_COLOR, size: 20, align: :left
+    text date.strftime("<b>%B %-d</b>, %Y"), inline_format: true, size: 20, align: :left
   end
 
   grid([0, 3],[1, last_column]).bounding_box do
-    text date.strftime("%A"), color: DARK_COLOR, size: 20, align: :right
+    text date.strftime("%A"), size: 20, align: :right
+  end
+
+  # Hour labels
+  (0...HOUR_COUNT).each do |hour|
+    grid(hour * 2 + fist_hour_row, 0).bounding_box do
+      if HOUR_LABELS[hour]
+        translate(-4, 0) { text HOUR_LABELS[hour].to_s, align: :right, valign: :center }
+      end
+    end
   end
 
   # Horizontal lines
@@ -132,7 +143,7 @@ def time_page date
   end
 
   # Vertical lines
-  (0...column_count).each do |col|
+  (0...COLUMN_COUNT).each do |col|
     grid([header_row_count, col], [last_hour_row, col]).bounding_box do
       dash 2
       stroke_line(bounds.top_right, bounds.bottom_right)
@@ -147,21 +158,19 @@ Prawn::Document.generate("time_block_pages.pdf") do
     'Futura' => {
       normal: { file: path, font: 'Futura Medium' },
       italic: { file: path, font: 'Futura Medium Italic' },
-      bold: { file: path, font: 'Futura Bold' },
-    },
-    # 'Futura Condensed' => {
-    #   normal: { file: path, font: 'Futura Condensed Medium' },
-    #   bold: { file: path, font: 'Futura Condensed ExtraBold' },
-    # }
+      # bold: { file: path, font: 'Futura Bold' },
+      bold: { file: path, font: 'Futura Condensed ExtraBold' },
+      condensed: { file: path, font: 'Futura Condensed Medium' },
+    }
   )
   font("Futura")
   stroke_color MEDIUM_COLOR
-
 
   date = DateTime.now.to_date
   sunday = date.next_day(7 - date.wday)
 
   week_page sunday
+
   # I just want week days
   (1..5).each do |i|
     day = sunday.next_day(i)
