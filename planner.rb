@@ -2,12 +2,14 @@ require "prawn"
 require 'pry'
 require 'date'
 
+WEEKS = 1
 HOUR_LABELS = [nil, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, nil, nil]
 HOUR_COUNT = HOUR_LABELS.length
 COLUMN_COUNT = 5
 MEDIUM_COLOR = '666666'
 DARK_COLOR   = '000000'
-OSX_FONT_PATH = "/System/Library/Fonts/Supplemental/"
+OSX_FONT_PATH = "/System/Library/Fonts/Supplemental/Futura.ttc"
+FILE_NAME = "time_block_pages.pdf"
 
 def week_page sunday
   header_row_count = 2
@@ -51,7 +53,7 @@ def task_page date
 
   # Daily metrics
   grid([1, 0], [4, 3]).bounding_box do
-    dash 2
+    dash 2, phase: 1
     stroke_bounds
     undash
 
@@ -89,9 +91,21 @@ def task_page date
 
   # Vertical line
   grid([6, 1], [last_row, 1]).bounding_box do
-    dash 2
+    dash 2, phase: 1
     stroke_line(bounds.top_right, bounds.bottom_right)
     undash
+  end
+
+  # Checkboxes
+  checkbox_padding = 6
+  checkbox_size = grid.row_height - (2 * checkbox_padding)
+  (6..last_row).each do |row|
+    grid(row, 0).bounding_box do
+      dash 1, phase: 0.5
+      rectangle [bounds.top_left[0] + checkbox_padding, bounds.top_left[1] - checkbox_padding], checkbox_size, checkbox_size
+      stroke
+      undash
+    end
   end
 end
 
@@ -106,7 +120,7 @@ def time_page date
 
   # Header
   grid([0, 1],[1, 2]).bounding_box do
-    text date.strftime("<b>%B %-d</b>, %Y"), inline_format: true, size: 20, align: :left
+    text date.strftime("%B <b>%-d</b>, %Y"), inline_format: true, size: 20, align: :left
   end
 
   grid([0, 3],[1, last_column]).bounding_box do
@@ -132,7 +146,7 @@ def time_page date
   (fist_hour_row..last_hour_row).step(2) do |row|
     ## Half hour lines
     grid([row, 1], [row, last_column]).bounding_box do
-      dash 2
+      dash 2, phase: 2
       stroke_line([bounds.bottom_left[0] - overhang, bounds.bottom_left[1]], bounds.bottom_right)
       undash
     end
@@ -145,22 +159,22 @@ def time_page date
   # Vertical lines
   (0...COLUMN_COUNT).each do |col|
     grid([header_row_count, col], [last_hour_row, col]).bounding_box do
-      dash 2
+      dash 2, phase: 1
       stroke_line(bounds.top_right, bounds.bottom_right)
       undash
     end
   end
 end
 
-Prawn::Document.generate("time_block_pages.pdf") do
-  path = OSX_FONT_PATH + "Futura.ttc"
+
+Prawn::Document.generate(FILE_NAME) do
   font_families.update(
     'Futura' => {
-      normal: { file: path, font: 'Futura Medium' },
-      italic: { file: path, font: 'Futura Medium Italic' },
-      # bold: { file: path, font: 'Futura Bold' },
-      bold: { file: path, font: 'Futura Condensed ExtraBold' },
-      condensed: { file: path, font: 'Futura Condensed Medium' },
+      normal: { file: OSX_FONT_PATH, font: 'Futura Medium' },
+      italic: { file: OSX_FONT_PATH, font: 'Futura Medium Italic' },
+      # bold: { file: OSX_FONT_PATH, font: 'Futura Bold' },
+      bold: { file: OSX_FONT_PATH, font: 'Futura Condensed ExtraBold' },
+      condensed: { file: OSX_FONT_PATH, font: 'Futura Condensed Medium' },
     }
   )
   font("Futura")
@@ -169,15 +183,20 @@ Prawn::Document.generate("time_block_pages.pdf") do
   date = DateTime.now.to_date
   sunday = date.next_day(7 - date.wday)
 
-  week_page sunday
+  WEEKS.times do
+    puts "Generate pages for the week of #{sunday.strftime('%B %-d, %Y')} in #{FILE_NAME}"
+    week_page sunday
 
-  # I just want week days
-  (1..5).each do |i|
-    day = sunday.next_day(i)
-    start_new_page
-    task_page day
+    # I just want week days
+    (1..5).each do |i|
+      day = sunday.next_day(i)
+      start_new_page
+      task_page day
 
-    start_new_page
-    time_page day
+      start_new_page
+      time_page day
+    end
+
+    sunday = sunday.next_day(7)
   end
 end
