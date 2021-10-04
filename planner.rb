@@ -6,12 +6,12 @@ WEEKS = 1
 HOUR_LABELS = [nil, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, nil, nil]
 HOUR_COUNT = HOUR_LABELS.length
 COLUMN_COUNT = 5
-MEDIUM_COLOR = '666666'
+MEDIUM_COLOR = '888888'
 DARK_COLOR   = '000000'
 OSX_FONT_PATH = "/System/Library/Fonts/Supplemental/Futura.ttc"
 FILE_NAME = "time_block_pages.pdf"
 
-def week_page sunday
+def week_page first_day, last_day
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
   last_column = COLUMN_COUNT - 1
@@ -21,15 +21,19 @@ def week_page sunday
   # grid.show_all
 
   # Header
-  grid([0, 1],[0, 2]).bounding_box do
+  grid([0, 1],[0, last_column]).bounding_box do
     text "The Week Ahead", inline_format: true, size: 20, align: :left
   end
   grid([0, 3],[0, last_column]).bounding_box do
-    text sunday.strftime("Week <b>%W</b>"), inline_format: true, size: 20, align: :right
+    text first_day.strftime("Week %W"), inline_format: true, size: 20, align: :right
+  end
+  grid([1, 1],[1, last_column]).bounding_box do
+    range = "#{first_day.strftime('%A, %B %-d')} — #{last_day.strftime('%A, %B %-d, %Y')}"
+    text range, color: MEDIUM_COLOR, align: :left
   end
 
   # Horizontal lines
-  (1..last_row).each do |row|
+  (2..last_row).each do |row|
     grid([row, 1], [row, last_column]).bounding_box do
       stroke_line bounds.bottom_left, bounds.bottom_right
     end
@@ -45,10 +49,10 @@ def task_page date
 
   # Header
   grid([0, 0],[1, 2]).bounding_box do
-    text date.strftime("Week <b>%W</b>"), inline_format: true, size: 20, align: :left
+    text date.strftime("Week %W"), inline_format: true, size: 20, align: :left
   end
   grid([0, 2],[1, 3]).bounding_box do
-    text date.strftime("Day <b>%j</b>"), inline_format: true, size: 20, align: :right
+    text date.strftime("Day %j"), inline_format: true, size: 20, align: :right
   end
 
   # Daily metrics
@@ -120,7 +124,7 @@ def time_page date
 
   # Header
   grid([0, 1],[1, 2]).bounding_box do
-    text date.strftime("%B <b>%-d</b>, %Y"), inline_format: true, size: 20, align: :left
+    text date.strftime("%B %-d, %Y"), inline_format: true, size: 20, align: :left
   end
 
   grid([0, 3],[1, last_column]).bounding_box do
@@ -139,14 +143,14 @@ def time_page date
   # Horizontal lines
   ## Top line
   stroke_color MEDIUM_COLOR
-  overhang = grid.column_width / 4
+  overhang = grid.column_width / 6
   grid([fist_hour_row, 1], [fist_hour_row, last_column]).bounding_box do
     stroke_line([bounds.top_left[0] - overhang, bounds.top_left[1]], bounds.top_right)
   end
   (fist_hour_row..last_hour_row).step(2) do |row|
     ## Half hour lines
     grid([row, 1], [row, last_column]).bounding_box do
-      dash 2, phase: 2
+      dash 2, phase: 3
       stroke_line([bounds.bottom_left[0] - overhang, bounds.bottom_left[1]], bounds.bottom_right)
       undash
     end
@@ -179,13 +183,28 @@ Prawn::Document.generate(FILE_NAME) do
   )
   font("Futura")
   stroke_color MEDIUM_COLOR
+  line_width(0.5)
 
-  date = DateTime.now.to_date
-  sunday = date.next_day(7 - date.wday)
+  sunday = if ARGV.empty?
+      date = DateTime.now.to_date
+      puts "Generating pages for the next week"
+      date.next_day(7 - date.wday)
+    else
+      date = DateTime.parse(ARGV.first).to_date
+      puts "Parsed #{date} from arguments"
+      date.prev_day(date.wday)
+    end
 
-  WEEKS.times do
-    puts "Generate pages for the week of #{sunday.strftime('%B %-d, %Y')} in #{FILE_NAME}"
-    week_page sunday
+  WEEKS.times do |week|
+    unless week.zero?
+      start_new_page
+      start_new_page
+    end
+
+    monday = sunday.next_day(1)
+    friday = sunday.next_day(5)
+    puts "Generate pages for week #{monday.strftime('%W')}: #{monday.strftime('%A, %B %-d, %Y')} through #{friday.strftime('%A, %B %-d, %Y')} in #{FILE_NAME}"
+    week_page monday, friday
 
     # I just want week days
     (1..5).each do |i|
