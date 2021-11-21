@@ -2,7 +2,7 @@ require "prawn"
 require 'pry'
 require 'date'
 
-WEEKS = 1
+WEEKS = 2
 HOUR_LABELS = [nil, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, nil, nil]
 HOUR_COUNT = HOUR_LABELS.length
 COLUMN_COUNT = 4
@@ -73,9 +73,18 @@ def quarter(date)
   (date.month / 3.0).ceil
 end
 
+def draw_checkbox checkbox_size, checkbox_padding
+  dash 1, phase: 0.5
+  rectangle [bounds.top_left[0] + checkbox_padding, bounds.top_left[1] - checkbox_padding], checkbox_size, checkbox_size
+  stroke
+  undash
+end
+
 # * * *
 
-def week_page first_day, last_day
+def week_ahead_page first_day, last_day
+  # We don't start our own page since we don't know if this is the first week or one
+  # of several weeks in a file.
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
   first_column = 0
@@ -146,12 +155,12 @@ def task_page date
 
   # Tasks / Notes
   grid([5, 0], [5, 1]).bounding_box do
-    translate 10, 0 do
+    translate 6, 0 do
       text "Tasks:", color: DARK_COLOR, valign: :center
     end
   end
   grid([5, 2], [5, 3]).bounding_box do
-    translate 10, 0 do
+    translate 6, 0 do
       text "Notes:", color: DARK_COLOR, valign: :center
     end
   end
@@ -175,10 +184,7 @@ def task_page date
   checkbox_size = grid.row_height - (2 * checkbox_padding)
   (6..last_row).each do |row|
     grid(row, 0).bounding_box do
-      dash 1, phase: 0.5
-      rectangle [bounds.top_left[0] + checkbox_padding, bounds.top_left[1] - checkbox_padding], checkbox_size, checkbox_size
-      stroke
-      undash
+      draw_checkbox checkbox_size, checkbox_padding
     end
   end
 end
@@ -250,6 +256,80 @@ def time_page date
   end
 end
 
+
+def weekend_page saturday, sunday
+  start_new_page(margin: LEFT_PAGE_MARGINS)
+
+  header_row_count = 2
+  task_row_count = HOUR_COUNT
+  hour_row_count = HOUR_COUNT
+  body_row_count = header_row_count + task_row_count + hour_row_count
+
+  define_grid(columns: COLUMN_COUNT, rows: body_row_count, gutter: 0)
+  # grid.show_all
+
+  # Header
+  left_header = saturday.strftime("%A")
+  left_sub_header = saturday.strftime("%B %-d")
+  right_header = sunday.strftime("%A")
+  right_sub_header = sunday.strftime("%B %-d")
+  grid([0, 0],[0, 1]).bounding_box do
+    text left_header, size: 20, align: :left
+  end
+  grid([1, 0],[1, 1]).bounding_box do
+    text left_sub_header, color: MEDIUM_COLOR, align: :left
+  end
+  grid([0, 2],[0, 3]).bounding_box do
+    text right_header, size: 20, align: :left
+  end
+  grid([1, 2],[1, 3]).bounding_box do
+    text right_sub_header, color: MEDIUM_COLOR, align: :left
+  end
+
+  task_start_row = header_row_count
+  task_last_row = task_start_row + task_row_count - 1
+
+  # Tasks / Notes
+  grid([task_start_row, 0], [task_start_row, 1]).bounding_box do
+    translate 6, 0 do
+      text "Tasks:", color: DARK_COLOR, valign: :center
+    end
+  end
+  grid([task_start_row, 2], [task_start_row, 3]).bounding_box do
+    translate 6, 0 do
+      text "Tasks:", color: DARK_COLOR, valign: :center
+    end
+  end
+
+  # Horizontal lines
+  (task_start_row..task_last_row).each do |row|
+    grid([row, 0], [row, 3]).bounding_box do
+      stroke_line bounds.bottom_left, bounds.bottom_right
+    end
+  end
+
+  # Vertical line
+  grid([task_start_row + 1, 1], [task_last_row, 1]).bounding_box do
+    dash 2, phase: 1
+    stroke_line(bounds.top_right, bounds.bottom_right)
+    undash
+  end
+
+  # Checkboxes
+  checkbox_padding = 6
+  checkbox_size = grid.row_height - (2 * checkbox_padding)
+  ((task_start_row + 1)..task_last_row).each do |row|
+    grid(row, 0).bounding_box do
+      draw_checkbox checkbox_size, checkbox_padding
+    end
+    grid(row, 2).bounding_box do
+      draw_checkbox checkbox_size, checkbox_padding
+    end
+  end
+
+  # TODO figure out some hour grid to go here.
+end
+
 Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS) do
   font_families.update(
     'Futura' => {
@@ -276,8 +356,6 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS) do
 
   WEEKS.times do |week|
     unless week.zero?
-      # Put a blank page in for the back of Friday...
-      start_new_page(margin: LEFT_PAGE_MARGINS)
       # ...then the page for the week
       start_new_page(margin: RIGHT_PAGE_MARGINS)
     end
@@ -285,7 +363,7 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS) do
     monday = sunday.next_day(1)
     friday = sunday.next_day(5)
     puts "Generate pages for week #{monday.strftime('%W')}: #{monday.strftime('%A, %B %-d, %Y')} through #{friday.strftime('%A, %B %-d, %Y')} in #{FILE_NAME}"
-    week_page monday, friday
+    week_ahead_page monday, friday
 
     # I just want week days
     (1..5).each do |i|
@@ -293,6 +371,8 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS) do
       task_page day
       time_page day
     end
+
+    weekend_page sunday.next_day(6), sunday.next_day(7)
 
     sunday = sunday.next_day(7)
   end
