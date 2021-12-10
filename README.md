@@ -19,7 +19,7 @@ bundle install
 
 It assumes you want to generate pages for the next week so there are no options:
 ```
-bundle exec ruby planner.rb
+bundle exec planner.rb
 ```
 
 ## Limitations

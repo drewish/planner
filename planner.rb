@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require "prawn"
 require 'pry'
 require 'date'
