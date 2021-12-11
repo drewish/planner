@@ -267,7 +267,7 @@ def weekend_page saturday, sunday
   start_new_page(margin: LEFT_PAGE_MARGINS)
 
   header_row_count = 2
-  task_row_count = HOUR_COUNT
+  task_row_count = HOUR_COUNT # TODO: this should probably be what ever's left over after hours
   hour_row_count = HOUR_COUNT
   body_row_count = header_row_count + task_row_count + hour_row_count
 
@@ -334,6 +334,48 @@ def weekend_page saturday, sunday
   end
 
   # TODO figure out some hour grid to go here.
+  hour_start_row = task_last_row + 1
+  hour_last_row = hour_start_row + hour_row_count - 1
+
+  # Horizontal Lines
+  (hour_start_row..hour_last_row).each do |row|
+    grid([row, 0], [row, 3]).bounding_box do
+      stroke_line bounds.bottom_left, bounds.bottom_right
+    end
+  end
+
+  # Vertical lines
+  grid([hour_start_row + 1, 0], [hour_last_row, 0]).bounding_box do
+    stroke_line(bounds.top_left, bounds.bottom_left)
+  end
+  # half
+  grid([hour_start_row + 1, 0], [hour_last_row, 0]).bounding_box do
+    dash 2, phase: 1
+    stroke_line(bounds.top_right, bounds.bottom_right)
+    undash
+  end
+  grid([hour_start_row + 1, 1], [hour_last_row, 1]).bounding_box do
+    stroke_line(bounds.top_right, bounds.bottom_right)
+  end
+  # half
+  grid([hour_start_row + 1, 2], [hour_last_row, 2]).bounding_box do
+    dash 2, phase: 1
+    stroke_line(bounds.top_right, bounds.bottom_right)
+    undash
+  end
+  grid([hour_start_row + 1, 3], [hour_last_row, 3]).bounding_box do
+    stroke_line(bounds.top_right, bounds.bottom_right)
+  end
+
+
+  ((hour_start_row + 1)..hour_last_row).each do |row|
+    grid(row, 0).bounding_box do
+      #text row.to_s
+    end
+    grid(row, 2).bounding_box do
+      #text row.to_s
+    end
+  end
 end
 
 Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS) do
