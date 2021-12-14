@@ -96,16 +96,20 @@ def week_ahead_page first_day, last_day
   define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
   # grid.show_all
 
-  # Header
+  # Header Left
   grid([0, first_column],[0, last_column]).bounding_box do
     text "The Week Ahead", inline_format: true, size: 20, align: :left
-  end
-  grid([0, 3],[0, last_column]).bounding_box do
-    text first_day.strftime("Week %W"), inline_format: true, size: 20, align: :right
   end
   grid([1, first_column],[1, last_column]).bounding_box do
     range = "#{first_day.strftime('%A, %B %-d')} — #{last_day.strftime('%A, %B %-d, %Y')}"
     text range, color: MEDIUM_COLOR, align: :left
+  end
+  # Header Right
+  grid([0, 3],[0, last_column]).bounding_box do
+    text first_day.strftime("Week %W"), inline_format: true, size: 20, align: :right
+  end
+  grid([1, 3],[1, last_column]).bounding_box do
+    text "Quarter #{quarter(first_day)}", color: MEDIUM_COLOR, align: :right
   end
 
   # Horizontal lines
