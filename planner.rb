@@ -241,11 +241,11 @@ def time_page date
   end
   (fist_hour_row..last_hour_row).step(2) do |row|
     ## Half hour lines
+    dash 2, phase: 1
     grid([row, first_column], [row, last_column]).bounding_box do
-      dash 2, phase: 1
       stroke_line([bounds.bottom_left[0] - overhang, bounds.bottom_left[1]], bounds.bottom_right)
-      undash
     end
+    undash
     ## Hour lines
     grid([row + 1, first_column], [row + 1, last_column]).bounding_box do
       stroke_line([bounds.bottom_left[0] - overhang, bounds.bottom_left[1]], bounds.bottom_right)
@@ -267,113 +267,96 @@ def weekend_page saturday, sunday
   start_new_page(margin: LEFT_PAGE_MARGINS)
 
   header_row_count = 2
-  task_row_count = HOUR_COUNT # TODO: this should probably be what ever's left over after hours
   hour_row_count = HOUR_COUNT
+  # TODO should have one constant for grid's number of rows to use here.
+  # instead we'll just assume it's always 2x hours. We print a row per hour
+  # and one blank line as a divider.
+  task_row_count = 2 * HOUR_COUNT - hour_row_count - 1
   body_row_count = header_row_count + task_row_count + hour_row_count
 
-  define_grid(columns: COLUMN_COUNT, rows: body_row_count, gutter: 0)
-  # grid.show_all
+  # Use a grid to do the math to divide the page into two columns:
+  define_grid(columns: 2, rows: 1, column_gutter: 24, row_gutter: 0)
+  first = grid(0,0)
+  second = grid(0,1)
+  # Then use that to build a bounding box for each column and redefine the grid in there.
+  work_areas = [
+    [saturday, first.top_left, { width: first.width, height: first.height }],
+    [sunday, second.top_left, { width: second.width, height: second.height }]
+  ].each do |date, point, options|
+    bounding_box(point, options) do
+      define_grid(columns: 2, rows: body_row_count, gutter: 0)
+      # grid.show_all
 
-  # Header
-  left_header = saturday.strftime("%A")
-  left_sub_header = saturday.strftime("%B %-d")
-  right_header = sunday.strftime("%A")
-  right_sub_header = sunday.strftime("%B %-d")
-  grid([0, 0],[0, 1]).bounding_box do
-    text left_header, size: 20, align: :left
-  end
-  grid([1, 0],[1, 1]).bounding_box do
-    text left_sub_header, color: MEDIUM_COLOR, align: :left
-  end
-  grid([0, 2],[0, 3]).bounding_box do
-    text right_header, size: 20, align: :left
-  end
-  grid([1, 2],[1, 3]).bounding_box do
-    text right_sub_header, color: MEDIUM_COLOR, align: :left
-  end
+      # Header
+      left_header = date.strftime("%A")
+      left_sub_header = date.strftime("%B %-d")
+      grid([0, 0],[0, 1]).bounding_box do
+        text left_header, size: 20, align: :left
+      end
+      grid([1, 0],[1, 1]).bounding_box do
+        text left_sub_header, color: MEDIUM_COLOR, align: :left
+      end
 
-  task_start_row = header_row_count
-  task_last_row = task_start_row + task_row_count - 1
+      task_start_row = header_row_count
+      task_last_row = task_start_row + task_row_count - 1
 
-  # Tasks / Notes
-  grid([task_start_row, 0], [task_start_row, 1]).bounding_box do
-    translate 6, 0 do
-      text "Tasks:", color: DARK_COLOR, valign: :center
-    end
-  end
-  grid([task_start_row, 2], [task_start_row, 3]).bounding_box do
-    translate 6, 0 do
-      text "Tasks:", color: DARK_COLOR, valign: :center
-    end
-  end
+      # Task lable
+      grid([task_start_row, 0], [task_start_row, 1]).bounding_box do
+        translate 6, 0 do
+          text "Tasks:", color: DARK_COLOR, valign: :center
+        end
+      end
 
-  # Horizontal lines
-  (task_start_row..task_last_row).each do |row|
-    grid([row, 0], [row, 3]).bounding_box do
-      stroke_line bounds.bottom_left, bounds.bottom_right
-    end
-  end
+      # Horizontal lines
+      (task_start_row..task_last_row).each do |row|
+        grid([row, 0], [row, 1]).bounding_box do
+          stroke_line bounds.bottom_left, bounds.bottom_right
+        end
+      end
 
-  # Vertical line
-  grid([task_start_row + 1, 1], [task_last_row, 1]).bounding_box do
-    dash 2, phase: 1
-    stroke_line(bounds.top_right, bounds.bottom_right)
-    undash
-  end
+      # Checkboxes
+      checkbox_padding = 6
+      checkbox_size = grid.row_height - (2 * checkbox_padding)
+      ((task_start_row + 1)..task_last_row).each do |row|
+        grid(row, 0).bounding_box do
+          draw_checkbox checkbox_size, checkbox_padding
+        end
+      end
 
-  # Checkboxes
-  checkbox_padding = 6
-  checkbox_size = grid.row_height - (2 * checkbox_padding)
-  ((task_start_row + 1)..task_last_row).each do |row|
-    grid(row, 0).bounding_box do
-      draw_checkbox checkbox_size, checkbox_padding
-    end
-    grid(row, 2).bounding_box do
-      draw_checkbox checkbox_size, checkbox_padding
-    end
-  end
+      # Hour Grid
+      hour_start_row = task_last_row + 1
+      hour_last_row = hour_start_row + hour_row_count - 1
 
-  # TODO figure out some hour grid to go here.
-  hour_start_row = task_last_row + 1
-  hour_last_row = hour_start_row + hour_row_count - 1
+      # Horizontal Lines
+      (hour_start_row..hour_last_row).each do |row|
+        grid([row, 0], [row, 1]).bounding_box do
+          stroke_line bounds.bottom_left, bounds.bottom_right
+        end
+      end
 
-  # Horizontal Lines
-  (hour_start_row..hour_last_row).each do |row|
-    grid([row, 0], [row, 3]).bounding_box do
-      stroke_line bounds.bottom_left, bounds.bottom_right
-    end
-  end
+      # Vertical lines
+      overhang = 24
+      dash 2, phase: 1
+      grid([hour_start_row + 1, 0], [hour_last_row, 0]).bounding_box do
+        stroke_line([bounds.top_left[0] + overhang, bounds.top_left[1]], [bounds.bottom_left[0] + overhang, bounds.bottom_left[1]])
+      end
+      # half plus change
+      grid([hour_start_row + 1, 0], [hour_last_row, 0]).bounding_box do
+        stroke_line([bounds.top_right[0] + overhang * 0.5, bounds.top_right[1]], [bounds.bottom_right[0] + overhang * 0.5, bounds.bottom_right[1]])
+      end
+      grid([hour_start_row + 1, 1], [hour_last_row, 1]).bounding_box do
+        stroke_line(bounds.top_right, bounds.bottom_right)
+      end
+      undash
 
-  # Vertical lines
-  grid([hour_start_row + 1, 0], [hour_last_row, 0]).bounding_box do
-    stroke_line(bounds.top_left, bounds.bottom_left)
-  end
-  # half
-  grid([hour_start_row + 1, 0], [hour_last_row, 0]).bounding_box do
-    dash 2, phase: 1
-    stroke_line(bounds.top_right, bounds.bottom_right)
-    undash
-  end
-  grid([hour_start_row + 1, 1], [hour_last_row, 1]).bounding_box do
-    stroke_line(bounds.top_right, bounds.bottom_right)
-  end
-  # half
-  grid([hour_start_row + 1, 2], [hour_last_row, 2]).bounding_box do
-    dash 2, phase: 1
-    stroke_line(bounds.top_right, bounds.bottom_right)
-    undash
-  end
-  grid([hour_start_row + 1, 3], [hour_last_row, 3]).bounding_box do
-    stroke_line(bounds.top_right, bounds.bottom_right)
-  end
-
-
-  ((hour_start_row + 1)..hour_last_row).each do |row|
-    grid(row, 0).bounding_box do
-      #text row.to_s
-    end
-    grid(row, 2).bounding_box do
-      #text row.to_s
+      # Hour labels
+      (0...HOUR_COUNT).each do |hour|
+        grid(hour + hour_start_row + 1, -1).bounding_box do
+          if HOUR_LABELS[hour]
+            translate(20, 0) { text HOUR_LABELS[hour].to_s, align: :right, valign: :center }
+          end
+        end
+      end
     end
   end
 end
