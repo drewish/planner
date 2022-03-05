@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
-require "prawn"
+require 'prawn'
+require 'prawn/measurement_extensions'
 require 'pry'
 require 'date'
 
@@ -10,6 +11,7 @@ HOUR_COUNT = HOUR_LABELS.length
 COLUMN_COUNT = 4
 MEDIUM_COLOR = '888888'
 DARK_COLOR   = '000000'
+DATE_LONG = "%B %-d, %Y"
 OSX_FONT_PATH = "/System/Library/Fonts/Supplemental/Futura.ttc"
 FILE_NAME = "time_block_pages.pdf"
 # Order is top, right, bottom, left
@@ -68,7 +70,33 @@ def business_days_between(start_date, end_date)
 end
 
 def business_days_left_in_year(date)
-  business_days_between(date, Date.new(date.year, 12, 31))
+  days = business_days_between(date, Date.new(date.year, 12, 31))
+  case days
+  when 0
+    "last work day of the year"
+  when 1
+    "1 work day left in the year"
+  else
+    "#{days} work days in the year"
+  end
+end
+
+def business_days_left_in_sprint(date)
+  sprint_end =
+    if date.mday <= 15
+      Date.new(date.year, date.month, 15)
+    else
+      Date.new(date.year, date.month, -1)
+    end
+  days = business_days_between(date, sprint_end)
+  case days
+  when 0
+    "last day of sprint"
+  when 1
+    "1 day left in sprint"
+  else
+    "#{days} days left in sprint"
+  end
 end
 
 def quarter(date)
@@ -82,11 +110,34 @@ def draw_checkbox checkbox_size, checkbox_padding
   undash
 end
 
+def begin_new_page side
+  margin = side == :left ? LEFT_PAGE_MARGINS : RIGHT_PAGE_MARGINS
+  start_new_page size: 'LETTER', layout: :portrait, margin: margin
+  if side == :right
+    hole_punches
+  end
+end
+
+def hole_punches
+  canvas do
+    x = 20
+    # Should be [(1.25).in, (5.5).in, (9.75).in] but there's some scaling
+    # that's skewing it so I just did some trial and error to get the points
+    # at the right spots
+    [72, 392, 710]. each do |y|
+      horizontal_line x - 5, x + 5, at: y
+      vertical_line y - 5, y + 5, at: x
+    end
+  end
+end
+
 # * * *
 
 def week_ahead_page first_day, last_day
   # We don't start our own page since we don't know if this is the first week or one
   # of several weeks in a file.
+  hole_punches
+
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
   first_column = 0
@@ -120,8 +171,8 @@ def week_ahead_page first_day, last_day
   end
 end
 
-def task_page date
-  start_new_page(margin: LEFT_PAGE_MARGINS)
+def daily_tasks_page date
+  begin_new_page :left
 
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
@@ -131,7 +182,7 @@ def task_page date
   # grid.show_all
 
   # Header
-  left_header = date.strftime("%B %-d, %Y") # date.strftime("Week %W")
+  left_header = date.strftime(DATE_LONG) # date.strftime("Week %W")
   right_header = date.strftime("%A") # date.strftime("Day %j")
   grid([0, 0],[1, 2]).bounding_box do
     text left_header, size: 20, align: :left
@@ -195,8 +246,8 @@ def task_page date
   end
 end
 
-def time_page date
-  start_new_page(margin: RIGHT_PAGE_MARGINS)
+def daily_calendar_page date
+  begin_new_page :right
 
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
@@ -208,11 +259,12 @@ def time_page date
   define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
 
   # Header
-  #left_header = date.strftime("%B %-d, %Y")
-  left_header = date.strftime("Week %W » Day %j")
+  left_header = date.strftime(DATE_LONG)
   # right_header = date.strftime("Day %j")
   right_header = date.strftime("%A")
-  sub_header = "#{business_days_left_in_year(date)} work days left in year"
+  left_subhed = date.strftime("Quarter #{quarter(date)} Week %W Day %j")
+  # right_subhed = business_days_left_in_year(date)
+  right_subhed = business_days_left_in_sprint(date)
   grid([0, first_column],[1, 1]).bounding_box do
     text left_header, size: 20, align: :left
   end
@@ -220,7 +272,10 @@ def time_page date
     text right_header, size: 20, align: :right
   end
   grid([1, first_column],[1, last_column]).bounding_box do
-    text sub_header, color: MEDIUM_COLOR, align: :left
+    text left_subhed, color: MEDIUM_COLOR, align: :left
+  end
+  grid([1, first_column],[1, last_column]).bounding_box do
+    text right_subhed, color: MEDIUM_COLOR, align: :right
   end
 
   # Hour labels
@@ -264,7 +319,7 @@ end
 
 
 def weekend_page saturday, sunday
-  start_new_page(margin: LEFT_PAGE_MARGINS)
+  begin_new_page :left
 
   header_row_count = 2
   hour_row_count = HOUR_COUNT
@@ -388,7 +443,7 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS) do
   WEEKS.times do |week|
     unless week.zero?
       # ...then the page for the week
-      start_new_page(margin: RIGHT_PAGE_MARGINS)
+      begin_new_page :right
     end
 
     monday = sunday.next_day(1)
@@ -399,8 +454,8 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS) do
     # I just want week days
     (1..5).each do |i|
       day = sunday.next_day(i)
-      task_page day
-      time_page day
+      daily_tasks_page day
+      daily_calendar_page day
     end
 
     weekend_page sunday.next_day(6), sunday.next_day(7)
