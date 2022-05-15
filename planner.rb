@@ -5,10 +5,11 @@ require 'prawn/measurement_extensions'
 require 'pry'
 require 'date'
 
-WEEKS = 2
+WEEKS = 1
 HOUR_LABELS = [nil, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, nil, nil]
 HOUR_COUNT = HOUR_LABELS.length
 COLUMN_COUNT = 4
+LIGHT_COLOR = 'AAAAAA'
 MEDIUM_COLOR = '888888'
 DARK_COLOR   = '000000'
 DATE_LONG = "%B %-d, %Y"
@@ -18,6 +19,8 @@ FILE_NAME = "time_block_pages.pdf"
 LEFT_PAGE_MARGINS = [36, 72, 36, 36]
 RIGHT_PAGE_MARGINS = [36, 36, 36, 72]
 
+# Names by day of week 0 is Sunday.
+OOOS_BY_WDAY = [nil, nil, ['Juan'], ['Kelly'], nil, ['Alex', 'Edna'], nil]
 
 # From https://stackoverflow.com/a/24753003/203673
 #
@@ -104,10 +107,13 @@ def quarter(date)
 end
 
 def draw_checkbox checkbox_size, checkbox_padding
+  original_color = stroke_color
+  stroke_color LIGHT_COLOR
   dash 1, phase: 0.5
   rectangle [bounds.top_left[0] + checkbox_padding, bounds.top_left[1] - checkbox_padding], checkbox_size, checkbox_size
   stroke
   undash
+  stroke_color original_color
 end
 
 def begin_new_page side
@@ -120,11 +126,12 @@ end
 
 def hole_punches
   canvas do
-    x = 20
+    x = 25
     # Should be [(1.25).in, (5.5).in, (9.75).in] but there's some scaling
     # that's skewing it so I just did some trial and error to get the points
     # at the right spots
-    [72, 392, 710]. each do |y|
+    [(1.25).in, (5.5).in, (9.75).in].each do |y|
+    #[72, 392, 710].each do |y|
       horizontal_line x - 5, x + 5, at: y
       vertical_line y - 5, y + 5, at: x
     end
@@ -142,6 +149,7 @@ def week_ahead_page first_day, last_day
   body_row_count = HOUR_COUNT * 2
   first_column = 0
   last_column = COLUMN_COUNT - 1
+  first_row = header_row_count
   last_row = header_row_count + body_row_count - 1
 
   define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
@@ -164,11 +172,22 @@ def week_ahead_page first_day, last_day
   end
 
   # Horizontal lines
-  (2..last_row).each do |row|
+  (first_row..last_row).each do |row|
     grid([row, first_column], [row, last_column]).bounding_box do
       stroke_line bounds.bottom_left, bounds.bottom_right
     end
   end
+
+  # Checkboxes
+  checkbox_padding = 6
+  checkbox_size = grid.row_height - (2 * checkbox_padding)
+  ((first_row + 1)..last_row).each do |row|
+    grid(row, 0).bounding_box do
+      draw_checkbox checkbox_size, checkbox_padding
+    end
+  end
+
+
 end
 
 def daily_tasks_page date
@@ -416,7 +435,69 @@ def weekend_page saturday, sunday
   end
 end
 
-Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS) do
+def one_on_one_page name, date
+  begin_new_page :right
+
+  header_row_count = 2
+  body_row_count = HOUR_COUNT * 2
+  define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
+  # grid.show_all
+
+  grid([0, 0],[1, 1]).bounding_box do
+    text name, size: 20, align: :left
+  end
+  grid([1, 0],[1, 1]).bounding_box do
+    text date.strftime(DATE_LONG), color: MEDIUM_COLOR, align: :left
+  end
+  # grid([0, 2],[0, 3]).bounding_box do
+  #   text "right heading", size: 20, align: :right
+  # end
+
+  sections = {
+    2 => "Personal/Notes: <color rgb='#{MEDIUM_COLOR}'>(Spouse, children, pets, hobbies, friends, history, etc.)</color>",
+    5 => "Their Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you take from their “10 minutes”)</color>",
+    14 => "My Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you make to prepare for your “10 minutes”)</color>",
+    22 => "Future/Follow Up: <color rgb='#{MEDIUM_COLOR}'>(Where are they headed? Items that you will review at the next 1-on-1)</color>",
+  }
+
+  footer_start = 25
+  footer_end = 29
+
+  (2...footer_start).each do |row|
+    grid([row, 0],[row, 3]).bounding_box do
+      if sections[row]
+        text sections[row], inline_format: true, valign: :bottom
+      else
+        stroke_line bounds.bottom_left, bounds.bottom_right
+      end
+    end
+  end
+
+  grid([footer_start, 0],[footer_start, 3]).bounding_box do
+    text "Questions to Ask:", valign: :bottom, color: MEDIUM_COLOR
+  end
+  grid([footer_start + 1, 0],[footer_end, 1]).bounding_box do
+    text "• Tell me about what you’ve been working on.\n" +
+      "• Tell me about your week – what’s it been like?\n" +
+      "• Tell me about your family/weekend/activities?\n" +
+      "• Where are you on ( ) project?\n" +
+      "• Are you on track to meet the deadline?\n" +
+      "• What questions do you have about the project?\n" +
+      "• What did ( ) say about this?", size: 10, color: MEDIUM_COLOR
+  end
+  grid([footer_start + 1, 2],[footer_end, 3]).bounding_box do
+    text "• Is there anything I need to do, and if so by when?\n" +
+      "• How are you going to approach this?\n" +
+      "• What do you think you should do?\n" +
+      "• So, you’re going to do “( )” by “( )”, right?\n" +
+      "• What can you/we do differently next time?\n" +
+      "• Any ideas/suggestions/improvements?", size: 10, color: MEDIUM_COLOR
+  end
+
+  begin_new_page :left
+end
+
+Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS, print_scaling: :none) do
   font_families.update(
     'Futura' => {
       normal: { file: OSX_FONT_PATH, font: 'Futura Medium' },
@@ -459,6 +540,13 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS) do
     end
 
     weekend_page sunday.next_day(6), sunday.next_day(7)
+
+    OOOS_BY_WDAY.each_with_index do |names, wday|
+      next if names.nil?
+      names.each do |name|
+        one_on_one_page name, sunday.next_day(wday)
+      end
+    end
 
     sunday = sunday.next_day(7)
   end
