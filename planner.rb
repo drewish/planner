@@ -108,12 +108,12 @@ end
 
 def draw_checkbox checkbox_size, checkbox_padding
   original_color = stroke_color
-  stroke_color LIGHT_COLOR
-  dash 1, phase: 0.5
+  stroke_color(LIGHT_COLOR)
+  dash [1, 2], phase: 0.5
   rectangle [bounds.top_left[0] + checkbox_padding, bounds.top_left[1] - checkbox_padding], checkbox_size, checkbox_size
   stroke
   undash
-  stroke_color original_color
+  stroke_color(original_color)
 end
 
 def begin_new_page side
@@ -212,7 +212,7 @@ def daily_tasks_page date
 
   # Daily metrics
   grid([1, 0], [4, 3]).bounding_box do
-    dash 2, phase: 1
+    dash [1, 2]
     stroke_bounds
     undash
 
@@ -250,7 +250,7 @@ def daily_tasks_page date
 
   # Vertical line
   grid([6, 1], [last_row, 1]).bounding_box do
-    dash 2, phase: 1
+    dash [1, 2], phase: 2
     stroke_line(bounds.top_right, bounds.bottom_right)
     undash
   end
@@ -315,7 +315,7 @@ def daily_calendar_page date
   end
   (fist_hour_row..last_hour_row).step(2) do |row|
     ## Half hour lines
-    dash 2, phase: 1
+    dash [1, 2], phase: 2
     grid([row, first_column], [row, last_column]).bounding_box do
       stroke_line([bounds.bottom_left[0] - overhang, bounds.bottom_left[1]], bounds.bottom_right)
     end
@@ -329,7 +329,7 @@ def daily_calendar_page date
   # Vertical lines
   (0..COLUMN_COUNT).each do |col|
     grid([header_row_count, col], [last_hour_row, col]).bounding_box do
-      dash 2, phase: 1
+      dash [1, 2], phase: 2
       stroke_line(bounds.top_left, bounds.bottom_left)
       undash
     end
@@ -410,7 +410,7 @@ def weekend_page saturday, sunday
 
       # Vertical lines
       overhang = 24
-      dash 2, phase: 1
+      dash [1, 2]
       grid([hour_start_row + 1, 0], [hour_last_row, 0]).bounding_box do
         stroke_line([bounds.top_left[0] + overhang, bounds.top_left[1]], [bounds.bottom_left[0] + overhang, bounds.bottom_left[1]])
       end
@@ -513,8 +513,13 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS, print_scaling: :
 
   sunday = if ARGV.empty?
       date = DateTime.now.to_date
-      puts "Generating pages for the next week"
-      date.next_day(7 - date.wday)
+      if date.wday > 2
+        puts "Generating pages for the next week"
+        date.next_day(7-date.wday)
+      else
+        puts "Generating pages for this week"
+        date.prev_day(date.wday)
+      end
     else
       date = DateTime.parse(ARGV.first).to_date
       puts "Parsed #{date} from arguments"
