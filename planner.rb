@@ -14,6 +14,14 @@ MEDIUM_COLOR = '888888'
 DARK_COLOR   = '000000'
 DATE_LONG = "%B %-d, %Y"
 OSX_FONT_PATH = "/System/Library/Fonts/Supplemental/Futura.ttc"
+FONTS = {
+  'Futura' => {
+    normal: { file: OSX_FONT_PATH, font: 'Futura Medium' },
+    italic: { file: OSX_FONT_PATH, font: 'Futura Medium Italic' },
+    bold: { file: OSX_FONT_PATH, font: 'Futura Condensed ExtraBold' },
+    condensed: { file: OSX_FONT_PATH, font: 'Futura Condensed Medium' },
+  }
+}
 FILE_NAME = "time_block_pages.pdf"
 PAGE_SIZE = 'LETTER' # Could also do 'A4'
 # Order is top, right, bottom, left
@@ -499,16 +507,8 @@ def one_on_one_page name, date
 end
 
 Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS, print_scaling: :none) do
-  font_families.update(
-    'Futura' => {
-      normal: { file: OSX_FONT_PATH, font: 'Futura Medium' },
-      italic: { file: OSX_FONT_PATH, font: 'Futura Medium Italic' },
-      # bold: { file: OSX_FONT_PATH, font: 'Futura Bold' },
-      bold: { file: OSX_FONT_PATH, font: 'Futura Condensed ExtraBold' },
-      condensed: { file: OSX_FONT_PATH, font: 'Futura Condensed Medium' },
-    }
-  )
-  font("Futura")
+  font_families.update(FONTS)
+  font(FONTS.keys.first)
   stroke_color MEDIUM_COLOR
   line_width(0.5)
 
