@@ -128,11 +128,11 @@ end
 def hole_punches
   canvas do
     x = 25
-    # Should be [(1.25).in, (5.5).in, (9.75).in] but there's some scaling
-    # that's skewing it so I just did some trial and error to get the points
-    # at the right spots
+    # Measuring it on the page it should be `[(1.25).in, (5.5).in, (9.75).in]`,
+    # but depending on the printer driver it might do some scaling. With one
+    # driver I printed a bunch of test pages and found that `[72, 392, 710]`
+    # put it in the right place so your milage may vary.
     [(1.25).in, (5.5).in, (9.75).in].each do |y|
-    #[72, 392, 710].each do |y|
       horizontal_line x - 5, x + 5, at: y
       vertical_line y - 5, y + 5, at: x
     end
