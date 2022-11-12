@@ -28,8 +28,19 @@ PAGE_SIZE = 'LETTER' # Could also do 'A4'
 LEFT_PAGE_MARGINS = [36, 72, 36, 36]
 RIGHT_PAGE_MARGINS = [36, 36, 36, 72]
 
-# Names by day of week 0 is Sunday.
+# Names by day of week, 0 is Sunday.
 OOOS_BY_WDAY = [nil, nil, ['Juan'], ['Kelly'], nil, ['Alex', 'Edna'], nil]
+
+# Repeating tasks by day of week, 0 is Sunday. Nested index is the row.
+TASKS_BY_WDAY = [
+  { 0 => 'Plan meals' },
+  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
+  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
+  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
+  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
+  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
+  { 0 => 'Plan next week' },
+]
 
 # From https://stackoverflow.com/a/24753003/203673
 #
@@ -115,7 +126,7 @@ def quarter(date)
   (date.month / 3.0).ceil
 end
 
-def draw_checkbox checkbox_size, checkbox_padding
+def draw_checkbox checkbox_size, checkbox_padding, label = nil
   original_color = stroke_color
   stroke_color(LIGHT_COLOR)
   dash [1, 2], phase: 0.5
@@ -123,6 +134,12 @@ def draw_checkbox checkbox_size, checkbox_padding
   stroke
   undash
   stroke_color(original_color)
+
+  unless label.nil? || label.empty?
+    translate checkbox_size + (2 * checkbox_padding), 0 do
+      text label, color: MEDIUM_COLOR, valign: :center
+    end
+  end
 end
 
 def begin_new_page side
@@ -267,9 +284,9 @@ def daily_tasks_page date
   # Checkboxes
   checkbox_padding = 6
   checkbox_size = grid.row_height - (2 * checkbox_padding)
-  (6..last_row).each do |row|
+  (6..last_row).each_with_index do |row, index|
     grid(row, 0).bounding_box do
-      draw_checkbox checkbox_size, checkbox_padding
+      draw_checkbox checkbox_size, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
     end
   end
 end
@@ -400,9 +417,9 @@ def weekend_page saturday, sunday
       # Checkboxes
       checkbox_padding = 6
       checkbox_size = grid.row_height - (2 * checkbox_padding)
-      ((task_start_row + 1)..task_last_row).each do |row|
+      ((task_start_row + 1)..task_last_row).each_with_index do |row, index|
         grid(row, 0).bounding_box do
-          draw_checkbox checkbox_size, checkbox_padding
+          draw_checkbox checkbox_size, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
         end
       end
 
