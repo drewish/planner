@@ -25,7 +25,12 @@ bundle install
 
 It assumes you want to generate pages for the next week so there are no options:
 ```
-bundle exec planner.rb
+./planner.rb
+```
+
+You can generate pages for a different weeks by passing in the date:
+```
+./planner.rb 2022-05-27
 ```
 
 On a Mac you can send the PDF directly to your printer:
