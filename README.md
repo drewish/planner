@@ -8,6 +8,9 @@ my take on it. It generates a PDF with a week's worth of 8.5 x 11 inch pages. Yo
 I'm also a fan of [Manager Tools' 1-on-1s](https://www.manager-tools.com/map-universe/one-ones) so I also
 incorporated a version of their form meeting form.
 
+If you prefer A4 or Helvetica, check out [jlorenzetti](https://github.com/jlorenzetti)'s [fork](https://github.com/jlorenzetti/planner).
+
+
 ## Installation
 
 Assuming you've got [Ruby](http://www.ruby-lang.org/en/) and [Bundler](https://bundler.io)
