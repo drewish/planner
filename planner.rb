@@ -127,15 +127,16 @@ def quarter(date)
 end
 
 def draw_checkbox checkbox_size, checkbox_padding, label = nil
+  no_label = label.nil? || label.empty?
   original_color = stroke_color
   stroke_color(LIGHT_COLOR)
-  dash [1, 2], phase: 0.5
+  dash([1, 2], phase: 0.5) if no_label
   rectangle [bounds.top_left[0] + checkbox_padding, bounds.top_left[1] - checkbox_padding], checkbox_size, checkbox_size
   stroke
-  undash
+  undash if no_label
   stroke_color(original_color)
 
-  unless label.nil? || label.empty?
+  unless no_label
     translate checkbox_size + (2 * checkbox_padding), 0 do
       text label, color: MEDIUM_COLOR, valign: :center
     end
