@@ -8,7 +8,7 @@ my take on it. It generates a PDF with a week's worth of 8.5 x 11 inch pages. Yo
 I'm also a fan of [Manager Tools' 1-on-1s](https://www.manager-tools.com/map-universe/one-ones) so I also
 incorporated a version of their form meeting form.
 
-If you prefer A4 or Helvetica, check out [jlorenzetti](https://github.com/jlorenzetti)'s [fork](https://github.com/jlorenzetti/planner).
+If you use Mac, then try drewish' original version. https://github.com/drewish/planner
 
 
 ## Installation
@@ -16,7 +16,7 @@ If you prefer A4 or Helvetica, check out [jlorenzetti](https://github.com/jloren
 Assuming you've got [Ruby](http://www.ruby-lang.org/en/) and [Bundler](https://bundler.io)
 installed you can just run:
 ```
-git clone git@github.com:drewish/planner.git
+git clone git@github.com:Hyunggilwoo/planner.git
 cd planner
 bundle install
 ```
@@ -33,11 +33,6 @@ You can generate pages for a different weeks by passing in the date:
 ./planner.rb 2022-05-27
 ```
 
-On a Mac you can send the PDF directly to your printer:
-```
-lpr time_block_pages.pdf
-```
-
 ## Limitations
 
-Probably only works on a Mac since it hardcodes the font path.
+This probably only works on Ubuntu because I hardcoded the Ubuntu font path.
