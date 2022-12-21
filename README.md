@@ -1,15 +1,20 @@
 # Generate Time-Block Planner Pages
 
-I'm a big fan of [Cal Newport's Time-Block Planner](https://www.timeblockplanner.com) but I didn't like 
-having unused weekend pages and got tired of writing in the dates so I wrote this script to generate
-my take on it. It generates a PDF with a week's worth of 8.5 x 11 inch pages. You can take a look at a
-[sample](sample.pdf) and see what you think.
+I'm a big fan of [Cal Newport's Time-Block Planner](https://www.timeblockplanner.com) 
+but I didn't like having unused weekend pages and got tired of writing in the 
+dates so I wrote this script to generate my own version of it. It generates a 
+PDF with a week's worth of 8.5 x 11 inch pages.
 
-I'm also a fan of [Manager Tools' 1-on-1s](https://www.manager-tools.com/map-universe/one-ones) so I also
-incorporated a version of their form meeting form.
+I'm also a fan of [Manager Tools' 1-on-1s](https://www.manager-tools.com/map-universe/one-ones),
+so I incorporated a version of their meeting form. You specify which people you 
+meet every week, and you'll get a page for each.
 
-If you prefer A4 or Helvetica, check out [jlorenzetti](https://github.com/jlorenzetti)'s [fork](https://github.com/jlorenzetti/planner).
-
+Take a look at a [sample](sample.pdf) and see what you think. If it's not to 
+your liking, feel free to customize it, or try out some of these:
+- [jlorenzetti's fork](https://github.com/jlorenzetti/planner) generates A4 
+pages in Helvetica, and omits the 1-on-1 forms.
+- [Hyunggilwoo's fork](https://github.com/Hyunggilwoo/planner) uses UbuntuMono
+and omits 1-on-1 forms. It looks like a good choice for Ubuntu users.
 
 ## Installation
 
