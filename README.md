@@ -10,9 +10,10 @@ so I incorporated a version of their meeting form. You specify which people you
 meet every week, and you'll get a page for each.
 
 Take a look at a [sample](sample.pdf) and see what you think. If it's not to 
-your liking, feel free to customize it, or try out some of these:
+your liking, feel free to customize it, or try out some of the other variations people have put together:
 - [jlorenzetti's fork](https://github.com/jlorenzetti/planner) generates A4 
 pages in Helvetica, and omits the 1-on-1 forms.
+  - [pzula's fork](https://github.com/pzula/planner) is based off of jlorenzetti's but scales it down to A5.
 - [Hyunggilwoo's fork](https://github.com/Hyunggilwoo/planner) uses UbuntuMono
 and omits 1-on-1 forms. It looks like a good choice for Ubuntu users.
 
