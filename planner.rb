@@ -213,8 +213,6 @@ def week_ahead_page first_day, last_day
       draw_checkbox checkbox_size, checkbox_padding
     end
   end
-
-
 end
 
 def daily_tasks_page date
@@ -565,12 +563,12 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS, print_scaling: :
 
     weekend_page sunday.next_day(6), sunday.next_day(7)
 
-    OOOS_BY_WDAY.each_with_index do |names, wday|
-      next if names.nil?
-      names.each do |name|
-        one_on_one_page name, sunday.next_day(wday)
-      end
-    end
+    OOOS_BY_WDAY
+      .each_with_index
+      .reject { |names, _| names.nil? }
+      .flat_map { |names, wday| names.map {|name| [name, sunday.next_day(wday)] } }
+      .sort_by { |name, date| name } # Sort by name or date, as you like
+      .each { |name, date| one_on_one_page name, date }
 
     sunday = sunday.next_day(7)
   end
