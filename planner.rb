@@ -28,6 +28,10 @@ PAGE_SIZE = 'LETTER' # Could also do 'A4'
 LEFT_PAGE_MARGINS = [36, 72, 36, 36]
 RIGHT_PAGE_MARGINS = [36, 36, 36, 72]
 
+# If you have
+SPRINT_EPOCH = Date.parse('2023-02-15')
+SPRINT_LENGTH = 14
+
 # Names by day of week, 0 is Sunday.
 OOOS_BY_WDAY = [nil, nil, ['Juan'], ['Kelly'], nil, ['Alex', 'Edna'], nil]
 
@@ -105,20 +109,21 @@ def business_days_left_in_year(date)
 end
 
 def business_days_left_in_sprint(date)
-  sprint_end =
-    if date.mday <= 15
-      Date.new(date.year, date.month, 15)
-    else
-      Date.new(date.year, date.month, -1)
-    end
+  # Use this if you have sprints that start on the 1st and 15th.
+  #sprint_end = Date.new(date.year, date.month, date.mday <= 15 ? 15 : -1)
+
+  # Use this if you have two week sprints from a given day.
+  sprint_start = SPRINT_EPOCH.step(date, SPRINT_LENGTH).to_a.last
+  sprint_end = sprint_start.next_day(SPRINT_LENGTH)
+
   days = business_days_between(date, sprint_end)
   case days
   when 0
-    "last day of sprint"
+    "last work day of sprint"
   when 1
-    "1 day left in sprint"
+    "1 work day left in sprint"
   else
-    "#{days} days left in sprint"
+    "#{days} work days left in sprint"
   end
 end
 
