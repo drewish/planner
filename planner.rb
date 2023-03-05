@@ -28,8 +28,12 @@ PAGE_SIZE = 'LETTER' # Could also do 'A4'
 LEFT_PAGE_MARGINS = [36, 72, 36, 36]
 RIGHT_PAGE_MARGINS = [36, 36, 36, 72]
 
-# If you have
-SPRINT_EPOCH = Date.parse('2023-02-15')
+# Adjust the quarters to a fiscal year, 1 for Jan, 2 for Feb, etc.
+Q1_START_MONTH = 2
+QUARTERS_BY_MONTH = (1..12).map { |month| (month / 3.0).ceil }.rotate(Q1_START_MONTH - 1).unshift(nil)
+
+# Use these if you have sprints of a weekly interval
+SPRINT_EPOCH = Date.parse('2023-01-04')
 SPRINT_LENGTH = 14
 
 # Names by day of week, 0 is Sunday.
@@ -128,7 +132,7 @@ def business_days_left_in_sprint(date)
 end
 
 def quarter(date)
-  (date.month / 3.0).ceil
+  QUARTERS_BY_MONTH[date.month]
 end
 
 def draw_checkbox checkbox_size, checkbox_padding, label = nil
@@ -180,11 +184,34 @@ end
 
 # * * *
 
+def quarter_ahead first_day
+  last_day = first_day.next_month(3)
+  heading_left = "Quarterly Plan"
+  subheading_left = "#{first_day.strftime('%A, %B %-d')} — #{last_day.strftime('%A, %B %-d, %Y')}"
+  heading_right = "Quarter #{quarter(first_day)}"
+
+  # We let the caller start our page for us but we'll do both sides
+  hole_punches
+  notes_page heading_left, subheading_left, heading_right
+  begin_new_page :left
+  notes_page heading_left, subheading_left, heading_right
+  begin_new_page :right
+end
+
 def week_ahead_page first_day, last_day
+  heading_left = "Weekly Plan"
+  subheading_left = "#{first_day.strftime('%A, %B %-d')} — #{last_day.strftime('%A, %B %-d, %Y')}"
+  heading_right = first_day.strftime("Week %W")
+  subheading_right = "Quarter #{quarter(first_day)}"
+
   # We don't start our own page since we don't know if this is the first week or one
   # of several weeks in a file.
   hole_punches
+  notes_page heading_left, subheading_left, heading_right, subheading_right
+end
 
+# Caller needs to start the page, so this could be the first page.
+def notes_page heading_left, subheading_left = nil, heading_right = nil, subheading_right = nil
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
   first_column = 0
@@ -197,18 +224,25 @@ def week_ahead_page first_day, last_day
 
   # Header Left
   grid([0, first_column],[0, last_column]).bounding_box do
-    text "The Week Ahead", heading_format(align: :left)
+    if heading_left
+      text heading_left, heading_format(align: :left)
+    end
   end
   grid([1, first_column],[1, last_column]).bounding_box do
-    range = "#{first_day.strftime('%A, %B %-d')} — #{last_day.strftime('%A, %B %-d, %Y')}"
-    text range, subheading_format(align: :left)
+    if subheading_left
+      text subheading_left, subheading_format(align: :left)
+    end
   end
   # Header Right
   grid([0, 3],[0, last_column]).bounding_box do
-    text first_day.strftime("Week %W"), heading_format(align: :right)
+    if heading_right
+      text heading_right, heading_format(align: :right)
+    end
   end
   grid([1, 3],[1, last_column]).bounding_box do
-    text "Quarter #{quarter(first_day)}", subheading_format(align: :right)
+    if subheading_right
+      text subheading_right, subheading_format(align: :right)
+    end
   end
 
   # Horizontal lines
@@ -558,23 +592,35 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS, print_scaling: :
 
   WEEKS.times do |week|
     unless week.zero?
-      # ...then the page for the week
       begin_new_page :right
     end
 
     monday = sunday.next_day(1)
     friday = sunday.next_day(5)
+    saturday = sunday.next_day(6)
+    next_sunday = sunday.next_day(7)
+
     puts "Generate pages for week #{monday.strftime('%W')}: #{monday.strftime('%A, %B %-d, %Y')} through #{friday.strftime('%A, %B %-d, %Y')} in #{FILE_NAME}"
+
+    # Quarterly goals
+    if sunday.month != next_sunday.month && (next_sunday.month % 3) == Q1_START_MONTH
+      start_of_quarter = Date.new(next_sunday.year, next_sunday.month, 1)
+      puts "Q#{quarter(start_of_quarter)} quarterly goals page for: #{start_of_quarter.strftime('%A, %B %-d, %Y')}"
+      quarter_ahead(start_of_quarter)
+    end
+
+    # Weekly goals
     week_ahead_page monday, friday
 
-    # I just want week days
+    # Daily pages
     (1..5).each do |i|
       day = sunday.next_day(i)
       daily_tasks_page day
       daily_calendar_page day
     end
 
-    weekend_page sunday.next_day(6), sunday.next_day(7)
+    # Weekend page
+    weekend_page saturday, next_sunday
 
     OOOS_BY_WDAY
       .each_with_index
@@ -583,7 +629,7 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS, print_scaling: :
       .sort_by { |name, date| name } # Sort by name or date, as you like
       .each { |name, date| one_on_one_page name, date }
 
-    sunday = sunday.next_day(7)
+    sunday = next_sunday
   end
 end
 
