@@ -12,7 +12,11 @@ COLUMN_COUNT = 4
 LIGHT_COLOR = 'AAAAAA'
 MEDIUM_COLOR = '888888'
 DARK_COLOR   = '000000'
-DATE_LONG = "%B %-d, %Y"
+DATE_FULL_START = '%A, %B %-d'
+DATE_FULL_END = ' — %A, %B %-d, %Y'
+DATE_FULL = '%A, %B %-d, %Y'
+DATE_LONG = '%B %-d, %Y'
+DATE_DAY = '%A'
 OSX_FONT_PATH = "/System/Library/Fonts/Supplemental/Futura.ttc"
 FONTS = {
   'Futura' => {
@@ -184,10 +188,9 @@ end
 
 # * * *
 
-def quarter_ahead first_day
-  last_day = first_day.next_month(3)
+def quarter_ahead first_day, last_day
   heading_left = "Quarterly Plan"
-  subheading_left = "#{first_day.strftime('%A, %B %-d')} — #{last_day.strftime('%A, %B %-d, %Y')}"
+  subheading_left = "#{first_day.strftime(DATE_FULL_START)}#{last_day.strftime(DATE_FULL_END)}"
   heading_right = "Quarter #{quarter(first_day)}"
 
   # We let the caller start our page for us but we'll do both sides
@@ -200,7 +203,7 @@ end
 
 def week_ahead_page first_day, last_day
   heading_left = "Weekly Plan"
-  subheading_left = "#{first_day.strftime('%A, %B %-d')} — #{last_day.strftime('%A, %B %-d, %Y')}"
+  subheading_left = "#{first_day.strftime(DATE_FULL_START)}#{last_day.strftime(DATE_FULL_END)}"
   heading_right = first_day.strftime("Week %W")
   subheading_right = "Quarter #{quarter(first_day)}"
 
@@ -435,7 +438,7 @@ def weekend_page saturday, sunday
 
       # Header
       left_header = date.strftime("%A")
-      left_sub_header = date.strftime("%B %-d")
+      left_sub_header = date.strftime(DATE_LONG)
       grid([0, 0],[0, 1]).bounding_box do
         text left_header, heading_format(align: :left)
       end
@@ -600,14 +603,15 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS, print_scaling: :
     saturday = sunday.next_day(6)
     next_sunday = sunday.next_day(7)
 
-    puts "Generate pages for week #{monday.strftime('%W')}: #{monday.strftime('%A, %B %-d, %Y')} through #{friday.strftime('%A, %B %-d, %Y')} in #{FILE_NAME}"
-
     # Quarterly goals
     if sunday.month != next_sunday.month && (next_sunday.month % 3) == Q1_START_MONTH
-      start_of_quarter = Date.new(next_sunday.year, next_sunday.month, 1)
-      puts "Q#{quarter(start_of_quarter)} quarterly goals page for: #{start_of_quarter.strftime('%A, %B %-d, %Y')}"
-      quarter_ahead(start_of_quarter)
+      first = Date.new(next_sunday.year, next_sunday.month, 1)
+      last = first.next_month(3).prev_day
+      puts "Q#{quarter(first)} quarterly goals page for: #{first.strftime(DATE_FULL_START)}#{last.strftime(DATE_FULL_END)}"
+      quarter_ahead(first, last)
     end
+
+    puts "Generate pages for week #{monday.strftime('%W')}: #{monday.strftime(DATE_FULL_START)}#{friday.strftime(DATE_FULL_END)} in #{FILE_NAME}"
 
     # Weekly goals
     week_ahead_page monday, friday
