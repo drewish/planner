@@ -16,6 +16,7 @@ pages in Helvetica, and omits the 1-on-1 forms.
   - [pzula's fork](https://github.com/pzula/planner) is based off of jlorenzetti's but scales it down to A5.
 - [Hyunggilwoo's fork](https://github.com/Hyunggilwoo/planner) uses UbuntuMono
 and omits 1-on-1 forms. It looks like a good choice for Ubuntu users.
+- [dianalow's fork](https://github.com/dianalow/time-block-planner) is scaled to fit in the [TRAVELER’S notebook](https://travelerscompanyusa.com/travelers-notebook-story/), and as usual omits, the 1:1 forms.
 
 ## Installation
 
