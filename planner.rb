@@ -612,7 +612,7 @@ Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS, print_scaling: :
       quarter_ahead(first, last)
     end
 
-    puts "Generate pages for week #{monday.strftime('%W')}: #{monday.strftime(DATE_FULL_START)}#{friday.strftime(DATE_FULL_END)} in #{FILE_NAME}"
+    puts "Generate pages for week #{monday.strftime('%W')}: #{monday.strftime(DATE_FULL_START)}#{next_sunday.strftime(DATE_FULL_END)} in #{FILE_NAME}"
 
     # Weekly goals
     week_ahead_page monday, friday
