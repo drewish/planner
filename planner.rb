@@ -122,7 +122,7 @@ def business_days_left_in_sprint(date)
 
   # Use this if you have two week sprints from a given day.
   sprint_start = SPRINT_EPOCH.step(date, SPRINT_LENGTH).to_a.last
-  sprint_end = sprint_start.next_day(SPRINT_LENGTH)
+  sprint_end = sprint_start.next_day(SPRINT_LENGTH - 1)
 
   days = business_days_between(date, sprint_end)
   case days
