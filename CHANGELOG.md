@@ -1,5 +1,8 @@
 # Change Log
 
+## 2023-05
+- Split the one-on-ones into a separate script.
+
 ## 2023-03
 - Added a quarterly planning page.
 - Options to control start of quarters.

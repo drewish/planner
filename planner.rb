@@ -1,58 +1,7 @@
 #!/usr/bin/env ruby
 
-require 'prawn'
-require 'prawn/measurement_extensions'
-require 'pry'
-require 'date'
-
-WEEKS = 1
-HOUR_LABELS = [nil, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, nil, nil]
-HOUR_COUNT = HOUR_LABELS.length
-COLUMN_COUNT = 4
-LIGHT_COLOR = 'AAAAAA'
-MEDIUM_COLOR = '888888'
-DARK_COLOR   = '000000'
-DATE_FULL_START = '%A, %B %-d'
-DATE_FULL_END = ' — %A, %B %-d, %Y'
-DATE_FULL = '%A, %B %-d, %Y'
-DATE_LONG = '%B %-d, %Y'
-DATE_DAY = '%A'
-OSX_FONT_PATH = "/System/Library/Fonts/Supplemental/Futura.ttc"
-FONTS = {
-  'Futura' => {
-    normal: { file: OSX_FONT_PATH, font: 'Futura Medium' },
-    italic: { file: OSX_FONT_PATH, font: 'Futura Medium Italic' },
-    bold: { file: OSX_FONT_PATH, font: 'Futura Condensed ExtraBold' },
-    condensed: { file: OSX_FONT_PATH, font: 'Futura Condensed Medium' },
-  }
-}
+require_relative './shared'
 FILE_NAME = "time_block_pages.pdf"
-PAGE_SIZE = 'LETTER' # Could also do 'A4'
-# Order is top, right, bottom, left
-LEFT_PAGE_MARGINS = [36, 72, 36, 36]
-RIGHT_PAGE_MARGINS = [36, 36, 36, 72]
-
-# Adjust the quarters to a fiscal year, 1 for Jan, 2 for Feb, etc.
-Q1_START_MONTH = 2
-QUARTERS_BY_MONTH = (1..12).map { |month| (month / 3.0).ceil }.rotate(Q1_START_MONTH - 1).unshift(nil)
-
-# Use these if you have sprints of a weekly interval
-SPRINT_EPOCH = Date.parse('2023-01-04')
-SPRINT_LENGTH = 14
-
-# Names by day of week, 0 is Sunday.
-OOOS_BY_WDAY = [nil, nil, ['Juan'], ['Kelly'], nil, ['Alex', 'Edna'], nil]
-
-# Repeating tasks by day of week, 0 is Sunday. Nested index is the row.
-TASKS_BY_WDAY = [
-  { 0 => 'Plan meals' },
-  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
-  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
-  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
-  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
-  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
-  { 0 => 'Plan next week' },
-]
 
 # From https://stackoverflow.com/a/24753003/203673
 #
@@ -154,36 +103,6 @@ def draw_checkbox pdf, checkbox_size, checkbox_padding, label = nil
       pdf.text label, color: MEDIUM_COLOR, valign: :center
     end
   end
-end
-
-def begin_new_page pdf, side
-  margin = side == :left ? LEFT_PAGE_MARGINS : RIGHT_PAGE_MARGINS
-  pdf.start_new_page size: PAGE_SIZE, layout: :portrait, margin: margin
-  if side == :right
-    hole_punches pdf
-  end
-end
-
-def hole_punches pdf
-  pdf.canvas do
-    x = 25
-    # Measuring it on the page it should be `[(1.25).in, (5.5).in, (9.75).in]`,
-    # but depending on the printer driver it might do some scaling. With one
-    # driver I printed a bunch of test pages and found that `[72, 392, 710]`
-    # put it in the right place so your milage may vary.
-    [(1.25).in, (5.5).in, (9.75).in].each do |y|
-      pdf.horizontal_line x - 5, x + 5, at: y
-      pdf.vertical_line y - 5, y + 5, at: x
-    end
-  end
-end
-
-def heading_format(overrides = {})
-  { size: 20, color: DARK_COLOR }.merge(overrides)
-end
-
-def subheading_format(overrides = {})
-  { size: 12, color: MEDIUM_COLOR }.merge(overrides)
 end
 
 # * * *
@@ -511,132 +430,39 @@ def weekend_page pdf, saturday, sunday
   end
 end
 
-def one_on_one_page pdf, name, date
-  begin_new_page pdf, :right
 
-  header_row_count = 2
-  body_row_count = HOUR_COUNT * 2
-  pdf.define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
-  # grid.show_all
+sunday, explanation = parse_start_of_week
+puts explanation
 
-  pdf.grid([0, 0],[1, 1]).bounding_box do
-    pdf.text name, heading_format(align: :left)
-  end
-  pdf.grid([1, 0],[1, 1]).bounding_box do
-    pdf.text date.strftime(DATE_LONG), subheading_format(align: :left)
-  end
-  # grid([0, 2],[0, 3]).bounding_box do
-  #   text "right heading", heading_format(align: :right)
-  # end
+monday = sunday.next_day(1)
+friday = sunday.next_day(5)
+saturday = sunday.next_day(6)
+next_sunday = sunday.next_day(7)
 
-  sections = {
-    2 => "Personal/Notes: <color rgb='#{MEDIUM_COLOR}'>(Spouse, children, pets, hobbies, friends, history, etc.)</color>",
-    5 => "Their Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you take from their “10 minutes”)</color>",
-    14 => "My Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you make to prepare for your “10 minutes”)</color>",
-    22 => "Future/Follow Up: <color rgb='#{MEDIUM_COLOR}'>(Where are they headed? Items that you will review at the next 1-on-1)</color>",
-  }
+pdf = init_pdf
 
-  footer_start = 25
-  footer_end = 29
-
-  (2...footer_start).each do |row|
-    pdf.grid([row, 0],[row, 3]).bounding_box do
-      if sections[row]
-        pdf.text sections[row], inline_format: true, valign: :bottom
-      else
-        pdf.stroke_line pdf.bounds.bottom_left, pdf.bounds.bottom_right
-      end
-    end
-  end
-
-  pdf.grid([footer_start, 0],[footer_start, 3]).bounding_box do
-    pdf.text "Questions to Ask:", valign: :bottom, color: MEDIUM_COLOR
-  end
-  pdf.grid([footer_start + 1, 0],[footer_end, 1]).bounding_box do
-    pdf.text "• Tell me about what you’ve been working on.\n" +
-      "• Tell me about your week – what’s it been like?\n" +
-      "• Tell me about your family/weekend/activities?\n" +
-      "• Where are you on ( ) project?\n" +
-      "• Are you on track to meet the deadline?\n" +
-      "• What questions do you have about the project?\n" +
-      "• What did ( ) say about this?", size: 10, color: MEDIUM_COLOR
-  end
-  pdf.grid([footer_start + 1, 2],[footer_end, 3]).bounding_box do
-    pdf.text "• Is there anything I need to do, and if so by when?\n" +
-      "• How are you going to approach this?\n" +
-      "• What do you think you should do?\n" +
-      "• So, you’re going to do “( )” by “( )”, right?\n" +
-      "• What can you/we do differently next time?\n" +
-      "• Any ideas/suggestions/improvements?", size: 10, color: MEDIUM_COLOR
-  end
-
-  begin_new_page pdf, :left
+# Quarterly goals
+if sunday.month != next_sunday.month && (next_sunday.month % 3) == Q1_START_MONTH
+  first = Date.new(next_sunday.year, next_sunday.month, 1)
+  last = first.next_month(3).prev_day
+  puts "Q#{quarter(first)} quarterly goals page for: #{first.strftime(DATE_FULL_START)}#{last.strftime(DATE_FULL_END)}"
+  quarter_ahead(pdf, first, last)
 end
 
-sunday =
-  if ARGV.empty?
-    date = DateTime.now.to_date
-    if date.wday > 2
-      puts "Generating pages for the next week"
-      date.next_day(7-date.wday)
-    else
-      puts "Generating pages for this week"
-      date.prev_day(date.wday)
-    end
-  else
-    date = DateTime.parse(ARGV.first).to_date
-    puts "Parsed #{date} from arguments"
-    date.prev_day(date.wday)
-  end
+puts "Generating time block planner for #{monday.strftime(DATE_FULL_START)}#{next_sunday.strftime(DATE_FULL_END)} into #{FILE_NAME}"
 
-pdf = Prawn::Document.new(margin: RIGHT_PAGE_MARGINS, print_scaling: :none)
-pdf.font_families.update(FONTS)
-pdf.font(FONTS.keys.first)
-pdf.stroke_color MEDIUM_COLOR
-pdf.line_width(0.5)
+# Weekly goals
+week_ahead_page pdf, monday, next_sunday
 
-WEEKS.times do |week|
-  unless week.zero?
-    begin_new_page pdf, :right
-  end
-
-  monday = sunday.next_day(1)
-  friday = sunday.next_day(5)
-  saturday = sunday.next_day(6)
-  next_sunday = sunday.next_day(7)
-
-  # Quarterly goals
-  if sunday.month != next_sunday.month && (next_sunday.month % 3) == Q1_START_MONTH
-    first = Date.new(next_sunday.year, next_sunday.month, 1)
-    last = first.next_month(3).prev_day
-    puts "Q#{quarter(first)} quarterly goals page for: #{first.strftime(DATE_FULL_START)}#{last.strftime(DATE_FULL_END)}"
-    quarter_ahead(pdf, first, last)
-  end
-
-  puts "Generate pages for week #{monday.strftime('%W')}: #{monday.strftime(DATE_FULL_START)}#{next_sunday.strftime(DATE_FULL_END)} in #{FILE_NAME}"
-
-  # Weekly goals
-  week_ahead_page pdf, monday, friday
-
-  # Daily pages
-  (1..5).each do |i|
-    day = sunday.next_day(i)
-    daily_tasks_page pdf, day
-    daily_calendar_page pdf, day
-  end
-
-  # Weekend page
-  weekend_page pdf, saturday, next_sunday
-
-  OOOS_BY_WDAY
-    .each_with_index
-    .reject { |names, _| names.nil? }
-    .flat_map { |names, wday| names.map {|name| [name, sunday.next_day(wday)] } }
-    .sort_by { |name, date| "#{name}#{date.iso8601}" } # Sort by name or date, as you like
-    .each { |name, date| one_on_one_page pdf, name, date }
-
-  sunday = next_sunday
+# Daily pages
+(1..5).each do |i|
+  day = sunday.next_day(i)
+  daily_tasks_page pdf, day
+  daily_calendar_page pdf, day
 end
+
+# Weekend page
+weekend_page pdf, saturday, next_sunday
 
 pdf.render_file FILE_NAME
 
