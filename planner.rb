@@ -139,41 +139,41 @@ def quarter(date)
   QUARTERS_BY_MONTH[date.month]
 end
 
-def draw_checkbox checkbox_size, checkbox_padding, label = nil
+def draw_checkbox pdf, checkbox_size, checkbox_padding, label = nil
   no_label = label.nil? || label.empty?
-  original_color = stroke_color
-  stroke_color(LIGHT_COLOR)
-  dash([1, 2], phase: 0.5) if no_label
-  rectangle [bounds.top_left[0] + checkbox_padding, bounds.top_left[1] - checkbox_padding], checkbox_size, checkbox_size
-  stroke
-  undash if no_label
-  stroke_color(original_color)
+  original_color = pdf.stroke_color
+  pdf.stroke_color(LIGHT_COLOR)
+  pdf.dash([1, 2], phase: 0.5) if no_label
+  pdf.rectangle [pdf.bounds.top_left[0] + checkbox_padding, pdf.bounds.top_left[1] - checkbox_padding], checkbox_size, checkbox_size
+  pdf.stroke
+  pdf.undash if no_label
+  pdf.stroke_color(original_color)
 
   unless no_label
-    translate checkbox_size + (2 * checkbox_padding), 0 do
-      text label, color: MEDIUM_COLOR, valign: :center
+    pdf.translate checkbox_size + (2 * checkbox_padding), 0 do
+      pdf.text label, color: MEDIUM_COLOR, valign: :center
     end
   end
 end
 
-def begin_new_page side
+def begin_new_page pdf, side
   margin = side == :left ? LEFT_PAGE_MARGINS : RIGHT_PAGE_MARGINS
-  start_new_page size: PAGE_SIZE, layout: :portrait, margin: margin
+  pdf.start_new_page size: PAGE_SIZE, layout: :portrait, margin: margin
   if side == :right
-    hole_punches
+    hole_punches pdf
   end
 end
 
-def hole_punches
-  canvas do
+def hole_punches pdf
+  pdf.canvas do
     x = 25
     # Measuring it on the page it should be `[(1.25).in, (5.5).in, (9.75).in]`,
     # but depending on the printer driver it might do some scaling. With one
     # driver I printed a bunch of test pages and found that `[72, 392, 710]`
     # put it in the right place so your milage may vary.
     [(1.25).in, (5.5).in, (9.75).in].each do |y|
-      horizontal_line x - 5, x + 5, at: y
-      vertical_line y - 5, y + 5, at: x
+      pdf.horizontal_line x - 5, x + 5, at: y
+      pdf.vertical_line y - 5, y + 5, at: x
     end
   end
 end
@@ -188,21 +188,21 @@ end
 
 # * * *
 
-def quarter_ahead first_day, last_day
+def quarter_ahead pdf, first_day, last_day
   heading_left = "Quarterly Plan"
   subheading_left = "#{first_day.strftime(DATE_FULL_START)}#{last_day.strftime(DATE_FULL_END)}"
   heading_right = "Quarter #{quarter(first_day)}"
   subheading_right = last_day.strftime('%Y')
 
   # We let the caller start our page for us but we'll do both sides
-  hole_punches
+  hole_punches pdf
   notes_page heading_left, subheading_left, heading_right, subheading_right
-  begin_new_page :left
+  begin_new_page pdf, :left
   notes_page heading_left, subheading_left, heading_right, subheading_right
-  begin_new_page :right
+  begin_new_page pdf, :right
 end
 
-def week_ahead_page first_day, last_day
+def week_ahead_page pdf, first_day, last_day
   heading_left = "Weekly Plan"
   subheading_left = "#{first_day.strftime(DATE_FULL_START)}#{last_day.strftime(DATE_FULL_END)}"
   heading_right = first_day.strftime("Week %W")
@@ -210,12 +210,12 @@ def week_ahead_page first_day, last_day
 
   # We don't start our own page since we don't know if this is the first week or one
   # of several weeks in a file.
-  hole_punches
-  notes_page heading_left, subheading_left, heading_right, subheading_right
+  hole_punches pdf
+  notes_page pdf, heading_left, subheading_left, heading_right, subheading_right
 end
 
 # Caller needs to start the page, so this could be the first page.
-def notes_page heading_left, subheading_left = nil, heading_right = nil, subheading_right = nil
+def notes_page pdf, heading_left, subheading_left = nil, heading_right = nil, subheading_right = nil
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
   first_column = 0
@@ -223,126 +223,126 @@ def notes_page heading_left, subheading_left = nil, heading_right = nil, subhead
   first_row = header_row_count
   last_row = header_row_count + body_row_count - 1
 
-  define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
+  pdf.define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
   # grid.show_all
 
   # Header Left
-  grid([0, first_column],[0, last_column]).bounding_box do
-    if heading_left
-      text heading_left, heading_format(align: :left)
+  if heading_left
+    pdf.grid([0, first_column],[0, last_column]).bounding_box do
+      pdf.text heading_left, heading_format(align: :left)
     end
   end
-  grid([1, first_column],[1, last_column]).bounding_box do
-    if subheading_left
-      text subheading_left, subheading_format(align: :left)
+  if subheading_left
+    pdf.grid([1, first_column],[1, last_column]).bounding_box do
+      pdf.text subheading_left, subheading_format(align: :left)
     end
   end
   # Header Right
-  grid([0, 3],[0, last_column]).bounding_box do
-    if heading_right
-      text heading_right, heading_format(align: :right)
+  if heading_right
+    pdf.grid([0, 3],[0, last_column]).bounding_box do
+      pdf.text heading_right, heading_format(align: :right)
     end
   end
-  grid([1, 3],[1, last_column]).bounding_box do
-    if subheading_right
-      text subheading_right, subheading_format(align: :right)
+  if subheading_right
+    pdf.grid([1, 3],[1, last_column]).bounding_box do
+      pdf.text subheading_right, subheading_format(align: :right)
     end
   end
 
   # Horizontal lines
   (first_row..last_row).each do |row|
-    grid([row, first_column], [row, last_column]).bounding_box do
-      stroke_line bounds.bottom_left, bounds.bottom_right
+    pdf.grid([row, first_column], [row, last_column]).bounding_box do
+      pdf.stroke_line pdf.bounds.bottom_left, pdf.bounds.bottom_right
     end
   end
 
   # Checkboxes
   checkbox_padding = 6
-  checkbox_size = grid.row_height - (2 * checkbox_padding)
+  checkbox_size = pdf.grid.row_height - (2 * checkbox_padding)
   ((first_row + 1)..last_row).each do |row|
-    grid(row, 0).bounding_box do
-      draw_checkbox checkbox_size, checkbox_padding
+    pdf.grid(row, 0).bounding_box do
+      draw_checkbox pdf, checkbox_size, checkbox_padding
     end
   end
 end
 
-def daily_tasks_page date
-  begin_new_page :left
+def daily_tasks_page pdf, date
+  begin_new_page pdf, :left
 
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
   last_row = header_row_count + body_row_count - 1
 
-  define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
+  pdf.define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
   # grid.show_all
 
   # Header
   left_header = date.strftime(DATE_LONG) # date.strftime("Week %W")
   right_header = date.strftime("%A") # date.strftime("Day %j")
-  grid([0, 0],[1, 2]).bounding_box do
-    text left_header, heading_format(align: :left)
+  pdf.grid([0, 0],[1, 2]).bounding_box do
+    pdf.text left_header, heading_format(align: :left)
   end
-  grid([0, 2],[1, 3]).bounding_box do
-    text right_header, heading_format(align: :right)
+  pdf.grid([0, 2],[1, 3]).bounding_box do
+    pdf.text right_header, heading_format(align: :right)
   end
 
   # Daily metrics
-  grid([1, 0], [4, 3]).bounding_box do
-    dash [1, 2]
-    stroke_bounds
-    undash
+  pdf.grid([1, 0], [4, 3]).bounding_box do
+    pdf.dash [1, 2]
+    pdf.stroke_bounds
+    pdf.undash
 
-    translate 10, -10 do
-      text "Daily Metrics", color: MEDIUM_COLOR
+    pdf.translate 10, -10 do
+      pdf.text "Daily Metrics", color: MEDIUM_COLOR
     end
 
-    stroke do
-      rectangle [bounds.bottom_right[0] - 20, bounds.bottom_right[1] + 20], 10, 10
+    pdf.stroke do
+      pdf.rectangle [pdf.bounds.bottom_right[0] - 20, pdf.bounds.bottom_right[1] + 20], 10, 10
     end
 
-    translate -27, 7 do
-      text "Shutdown Complete", color: MEDIUM_COLOR, align: :right, valign: :bottom
+    pdf.translate -27, 7 do
+      pdf.text "Shutdown Complete", color: MEDIUM_COLOR, align: :right, valign: :bottom
     end
   end
 
   # Tasks / Notes
-  grid([5, 0], [5, 1]).bounding_box do
-    translate 6, 0 do
-      text "Tasks:", color: DARK_COLOR, valign: :center
+  pdf.grid([5, 0], [5, 1]).bounding_box do
+    pdf.translate 6, 0 do
+      pdf.text "Tasks:", color: DARK_COLOR, valign: :center
     end
   end
-  grid([5, 2], [5, 3]).bounding_box do
-    translate 6, 0 do
-      text "Notes:", color: DARK_COLOR, valign: :center
+  pdf.grid([5, 2], [5, 3]).bounding_box do
+    pdf.translate 6, 0 do
+      pdf.text "Notes:", color: DARK_COLOR, valign: :center
     end
   end
 
   # Horizontal lines
   (5..last_row).each do |row|
-    grid([row, 0], [row, 3]).bounding_box do
-      stroke_line bounds.bottom_left, bounds.bottom_right
+    pdf.grid([row, 0], [row, 3]).bounding_box do
+      pdf.stroke_line pdf.bounds.bottom_left, pdf.bounds.bottom_right
     end
   end
 
   # Vertical line
-  grid([6, 1], [last_row, 1]).bounding_box do
-    dash [1, 2], phase: 2
-    stroke_line(bounds.top_right, bounds.bottom_right)
-    undash
+  pdf.grid([6, 1], [last_row, 1]).bounding_box do
+    pdf.dash [1, 2], phase: 2
+    pdf.stroke_line(pdf.bounds.top_right, pdf.bounds.bottom_right)
+    pdf.undash
   end
 
   # Checkboxes
   checkbox_padding = 6
-  checkbox_size = grid.row_height - (2 * checkbox_padding)
+  checkbox_size = pdf.grid.row_height - (2 * checkbox_padding)
   (6..last_row).each_with_index do |row, index|
-    grid(row, 0).bounding_box do
-      draw_checkbox checkbox_size, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
+    pdf.grid(row, 0).bounding_box do
+      draw_checkbox pdf, checkbox_size, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
     end
   end
 end
 
-def daily_calendar_page date
-  begin_new_page :right
+def daily_calendar_page pdf, date
+  begin_new_page pdf, :right
 
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
@@ -351,7 +351,7 @@ def daily_calendar_page date
   fist_hour_row = header_row_count
   last_hour_row = header_row_count + body_row_count - 1
 
-  define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
+  pdf.define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
 
   # Header
   left_header = date.strftime(DATE_LONG)
@@ -360,61 +360,61 @@ def daily_calendar_page date
   left_subhed = date.strftime("Quarter #{quarter(date)} Week %W Day %j")
   # right_subhed = business_days_left_in_year(date)
   right_subhed = business_days_left_in_sprint(date)
-  grid([0, first_column],[1, 1]).bounding_box do
-    text left_header, heading_format(align: :left)
+  pdf.grid([0, first_column],[1, 1]).bounding_box do
+    pdf.text left_header, heading_format(align: :left)
   end
-  grid([0, 2],[0, last_column]).bounding_box do
-    text right_header, heading_format(align: :right)
+  pdf.grid([0, 2],[0, last_column]).bounding_box do
+    pdf.text right_header, heading_format(align: :right)
   end
-  grid([1, first_column],[1, last_column]).bounding_box do
-    text left_subhed, subheading_format(align: :left)
+  pdf.grid([1, first_column],[1, last_column]).bounding_box do
+    pdf.text left_subhed, subheading_format(align: :left)
   end
-  grid([1, first_column],[1, last_column]).bounding_box do
-    text right_subhed, subheading_format(align: :right)
+  pdf.grid([1, first_column],[1, last_column]).bounding_box do
+    pdf.text right_subhed, subheading_format(align: :right)
   end
 
   # Hour labels
   (0...HOUR_COUNT).each do |hour|
-    grid(hour * 2 + fist_hour_row, -1).bounding_box do
+    pdf.grid(hour * 2 + fist_hour_row, -1).bounding_box do
       if HOUR_LABELS[hour]
-        translate(-4, 0) { text HOUR_LABELS[hour].to_s, align: :right, valign: :center }
+        pdf.translate(-4, 0) { pdf.text HOUR_LABELS[hour].to_s, align: :right, valign: :center }
       end
     end
   end
 
   # Horizontal lines
   ## Top line
-  stroke_color MEDIUM_COLOR
+  pdf.stroke_color MEDIUM_COLOR
   overhang = 24
-  grid([fist_hour_row, first_column], [fist_hour_row, last_column]).bounding_box do
-    stroke_line([bounds.top_left[0] - overhang, bounds.top_left[1]], bounds.top_right)
+  pdf.grid([fist_hour_row, first_column], [fist_hour_row, last_column]).bounding_box do
+    pdf.stroke_line([pdf.bounds.top_left[0] - overhang, pdf.bounds.top_left[1]], pdf.bounds.top_right)
   end
   (fist_hour_row..last_hour_row).step(2) do |row|
     ## Half hour lines
-    dash [1, 2], phase: 2
-    grid([row, first_column], [row, last_column]).bounding_box do
-      stroke_line([bounds.bottom_left[0] - overhang, bounds.bottom_left[1]], bounds.bottom_right)
+    pdf.dash [1, 2], phase: 2
+    pdf.grid([row, first_column], [row, last_column]).bounding_box do
+      pdf.stroke_line([pdf.bounds.bottom_left[0] - overhang, pdf.bounds.bottom_left[1]], pdf.bounds.bottom_right)
     end
-    undash
+    pdf.undash
     ## Hour lines
-    grid([row + 1, first_column], [row + 1, last_column]).bounding_box do
-      stroke_line([bounds.bottom_left[0] - overhang, bounds.bottom_left[1]], bounds.bottom_right)
+    pdf.grid([row + 1, first_column], [row + 1, last_column]).bounding_box do
+      pdf.stroke_line([pdf.bounds.bottom_left[0] - overhang, pdf.bounds.bottom_left[1]], pdf.bounds.bottom_right)
     end
   end
 
   # Vertical lines
   (0..COLUMN_COUNT).each do |col|
-    grid([header_row_count, col], [last_hour_row, col]).bounding_box do
-      dash [1, 2], phase: 2
-      stroke_line(bounds.top_left, bounds.bottom_left)
-      undash
+    pdf.grid([header_row_count, col], [last_hour_row, col]).bounding_box do
+      pdf.dash [1, 2], phase: 2
+      pdf.stroke_line(pdf.bounds.top_left, pdf.bounds.bottom_left)
+      pdf.undash
     end
   end
 end
 
 
-def weekend_page saturday, sunday
-  begin_new_page :left
+def weekend_page pdf, saturday, sunday
+  begin_new_page pdf, :left
 
   header_row_count = 2
   hour_row_count = HOUR_COUNT
@@ -425,51 +425,51 @@ def weekend_page saturday, sunday
   body_row_count = header_row_count + task_row_count + hour_row_count
 
   # Use a grid to do the math to divide the page into two columns:
-  define_grid(columns: 2, rows: 1, column_gutter: 24, row_gutter: 0)
-  first = grid(0,0)
-  second = grid(0,1)
+  pdf.define_grid(columns: 2, rows: 1, column_gutter: 24, row_gutter: 0)
+  first = pdf.grid(0,0)
+  second = pdf.grid(0,1)
   # Then use that to build a bounding box for each column and redefine the grid in there.
   work_areas = [
     [saturday, first.top_left, { width: first.width, height: first.height }],
     [sunday, second.top_left, { width: second.width, height: second.height }]
   ].each do |date, point, options|
-    bounding_box(point, options) do
-      define_grid(columns: 2, rows: body_row_count, gutter: 0)
+    pdf.bounding_box(point, options) do
+      pdf.define_grid(columns: 2, rows: body_row_count, gutter: 0)
       # grid.show_all
 
       # Header
       left_header = date.strftime("%A")
       left_sub_header = date.strftime(DATE_LONG)
-      grid([0, 0],[0, 1]).bounding_box do
-        text left_header, heading_format(align: :left)
+      pdf.grid([0, 0],[0, 1]).bounding_box do
+        pdf.text left_header, heading_format(align: :left)
       end
-      grid([1, 0],[1, 1]).bounding_box do
-        text left_sub_header, subheading_format(align: :left)
+      pdf.grid([1, 0],[1, 1]).bounding_box do
+        pdf.text left_sub_header, subheading_format(align: :left)
       end
 
       task_start_row = header_row_count
       task_last_row = task_start_row + task_row_count - 1
 
       # Task lable
-      grid([task_start_row, 0], [task_start_row, 1]).bounding_box do
-        translate 6, 0 do
-          text "Tasks:", color: DARK_COLOR, valign: :center
+      pdf.grid([task_start_row, 0], [task_start_row, 1]).bounding_box do
+        pdf.translate 6, 0 do
+          pdf.text "Tasks:", color: DARK_COLOR, valign: :center
         end
       end
 
       # Horizontal lines
       (task_start_row..task_last_row).each do |row|
-        grid([row, 0], [row, 1]).bounding_box do
-          stroke_line bounds.bottom_left, bounds.bottom_right
+        pdf.grid([row, 0], [row, 1]).bounding_box do
+          pdf.stroke_line pdf.bounds.bottom_left, pdf.bounds.bottom_right
         end
       end
 
       # Checkboxes
       checkbox_padding = 6
-      checkbox_size = grid.row_height - (2 * checkbox_padding)
+      checkbox_size = pdf.grid.row_height - (2 * checkbox_padding)
       ((task_start_row + 1)..task_last_row).each_with_index do |row, index|
-        grid(row, 0).bounding_box do
-          draw_checkbox checkbox_size, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
+        pdf.grid(row, 0).bounding_box do
+          draw_checkbox pdf, checkbox_size, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
         end
       end
 
@@ -479,31 +479,31 @@ def weekend_page saturday, sunday
 
       # Horizontal Lines
       (hour_start_row..hour_last_row).each do |row|
-        grid([row, 0], [row, 1]).bounding_box do
-          stroke_line bounds.bottom_left, bounds.bottom_right
+        pdf.grid([row, 0], [row, 1]).bounding_box do
+          pdf.stroke_line pdf.bounds.bottom_left, pdf.bounds.bottom_right
         end
       end
 
       # Vertical lines
       overhang = 24
-      dash [1, 2]
-      grid([hour_start_row + 1, 0], [hour_last_row, 0]).bounding_box do
-        stroke_line([bounds.top_left[0] + overhang, bounds.top_left[1]], [bounds.bottom_left[0] + overhang, bounds.bottom_left[1]])
+      pdf.dash [1, 2]
+      pdf.grid([hour_start_row + 1, 0], [hour_last_row, 0]).bounding_box do
+        pdf.stroke_line([pdf.bounds.top_left[0] + overhang, pdf.bounds.top_left[1]], [pdf.bounds.bottom_left[0] + overhang, pdf.bounds.bottom_left[1]])
       end
       # half plus change
-      grid([hour_start_row + 1, 0], [hour_last_row, 0]).bounding_box do
-        stroke_line([bounds.top_right[0] + overhang * 0.5, bounds.top_right[1]], [bounds.bottom_right[0] + overhang * 0.5, bounds.bottom_right[1]])
+      pdf.grid([hour_start_row + 1, 0], [hour_last_row, 0]).bounding_box do
+        pdf.stroke_line([pdf.bounds.top_right[0] + overhang * 0.5, pdf.bounds.top_right[1]], [pdf.bounds.bottom_right[0] + overhang * 0.5, pdf.bounds.bottom_right[1]])
       end
-      grid([hour_start_row + 1, 1], [hour_last_row, 1]).bounding_box do
-        stroke_line(bounds.top_right, bounds.bottom_right)
+      pdf.grid([hour_start_row + 1, 1], [hour_last_row, 1]).bounding_box do
+        pdf.stroke_line(pdf.bounds.top_right, pdf.bounds.bottom_right)
       end
-      undash
+      pdf.undash
 
       # Hour labels
       (0...HOUR_COUNT).each do |hour|
-        grid(hour + hour_start_row + 1, -1).bounding_box do
+        pdf.grid(hour + hour_start_row + 1, -1).bounding_box do
           if HOUR_LABELS[hour]
-            translate(20, 0) { text HOUR_LABELS[hour].to_s, align: :right, valign: :center }
+            pdf.translate(20, 0) { pdf.text HOUR_LABELS[hour].to_s, align: :right, valign: :center }
           end
         end
       end
@@ -511,19 +511,19 @@ def weekend_page saturday, sunday
   end
 end
 
-def one_on_one_page name, date
-  begin_new_page :right
+def one_on_one_page pdf, name, date
+  begin_new_page pdf, :right
 
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
-  define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
+  pdf.define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
   # grid.show_all
 
-  grid([0, 0],[1, 1]).bounding_box do
-    text name, heading_format(align: :left)
+  pdf.grid([0, 0],[1, 1]).bounding_box do
+    pdf.text name, heading_format(align: :left)
   end
-  grid([1, 0],[1, 1]).bounding_box do
-    text date.strftime(DATE_LONG), subheading_format(align: :left)
+  pdf.grid([1, 0],[1, 1]).bounding_box do
+    pdf.text date.strftime(DATE_LONG), subheading_format(align: :left)
   end
   # grid([0, 2],[0, 3]).bounding_box do
   #   text "right heading", heading_format(align: :right)
@@ -540,20 +540,20 @@ def one_on_one_page name, date
   footer_end = 29
 
   (2...footer_start).each do |row|
-    grid([row, 0],[row, 3]).bounding_box do
+    pdf.grid([row, 0],[row, 3]).bounding_box do
       if sections[row]
-        text sections[row], inline_format: true, valign: :bottom
+        pdf.text sections[row], inline_format: true, valign: :bottom
       else
-        stroke_line bounds.bottom_left, bounds.bottom_right
+        pdf.stroke_line pdf.bounds.bottom_left, pdf.bounds.bottom_right
       end
     end
   end
 
-  grid([footer_start, 0],[footer_start, 3]).bounding_box do
-    text "Questions to Ask:", valign: :bottom, color: MEDIUM_COLOR
+  pdf.grid([footer_start, 0],[footer_start, 3]).bounding_box do
+    pdf.text "Questions to Ask:", valign: :bottom, color: MEDIUM_COLOR
   end
-  grid([footer_start + 1, 0],[footer_end, 1]).bounding_box do
-    text "• Tell me about what you’ve been working on.\n" +
+  pdf.grid([footer_start + 1, 0],[footer_end, 1]).bounding_box do
+    pdf.text "• Tell me about what you’ve been working on.\n" +
       "• Tell me about your week – what’s it been like?\n" +
       "• Tell me about your family/weekend/activities?\n" +
       "• Where are you on ( ) project?\n" +
@@ -561,8 +561,8 @@ def one_on_one_page name, date
       "• What questions do you have about the project?\n" +
       "• What did ( ) say about this?", size: 10, color: MEDIUM_COLOR
   end
-  grid([footer_start + 1, 2],[footer_end, 3]).bounding_box do
-    text "• Is there anything I need to do, and if so by when?\n" +
+  pdf.grid([footer_start + 1, 2],[footer_end, 3]).bounding_box do
+    pdf.text "• Is there anything I need to do, and if so by when?\n" +
       "• How are you going to approach this?\n" +
       "• What do you think you should do?\n" +
       "• So, you’re going to do “( )” by “( )”, right?\n" +
@@ -570,71 +570,74 @@ def one_on_one_page name, date
       "• Any ideas/suggestions/improvements?", size: 10, color: MEDIUM_COLOR
   end
 
-  begin_new_page :left
+  begin_new_page pdf, :left
 end
 
-Prawn::Document.generate(FILE_NAME, margin: RIGHT_PAGE_MARGINS, print_scaling: :none) do
-  font_families.update(FONTS)
-  font(FONTS.keys.first)
-  stroke_color MEDIUM_COLOR
-  line_width(0.5)
-
-  sunday = if ARGV.empty?
-      date = DateTime.now.to_date
-      if date.wday > 2
-        puts "Generating pages for the next week"
-        date.next_day(7-date.wday)
-      else
-        puts "Generating pages for this week"
-        date.prev_day(date.wday)
-      end
+sunday =
+  if ARGV.empty?
+    date = DateTime.now.to_date
+    if date.wday > 2
+      puts "Generating pages for the next week"
+      date.next_day(7-date.wday)
     else
-      date = DateTime.parse(ARGV.first).to_date
-      puts "Parsed #{date} from arguments"
+      puts "Generating pages for this week"
       date.prev_day(date.wday)
     end
-
-  WEEKS.times do |week|
-    unless week.zero?
-      begin_new_page :right
-    end
-
-    monday = sunday.next_day(1)
-    friday = sunday.next_day(5)
-    saturday = sunday.next_day(6)
-    next_sunday = sunday.next_day(7)
-
-    # Quarterly goals
-    if sunday.month != next_sunday.month && (next_sunday.month % 3) == Q1_START_MONTH
-      first = Date.new(next_sunday.year, next_sunday.month, 1)
-      last = first.next_month(3).prev_day
-      puts "Q#{quarter(first)} quarterly goals page for: #{first.strftime(DATE_FULL_START)}#{last.strftime(DATE_FULL_END)}"
-      quarter_ahead(first, last)
-    end
-
-    puts "Generate pages for week #{monday.strftime('%W')}: #{monday.strftime(DATE_FULL_START)}#{next_sunday.strftime(DATE_FULL_END)} in #{FILE_NAME}"
-
-    # Weekly goals
-    week_ahead_page monday, friday
-
-    # Daily pages
-    (1..5).each do |i|
-      day = sunday.next_day(i)
-      daily_tasks_page day
-      daily_calendar_page day
-    end
-
-    # Weekend page
-    weekend_page saturday, next_sunday
-
-    OOOS_BY_WDAY
-      .each_with_index
-      .reject { |names, _| names.nil? }
-      .flat_map { |names, wday| names.map {|name| [name, sunday.next_day(wday)] } }
-      .sort_by { |name, date| name } # Sort by name or date, as you like
-      .each { |name, date| one_on_one_page name, date }
-
-    sunday = next_sunday
+  else
+    date = DateTime.parse(ARGV.first).to_date
+    puts "Parsed #{date} from arguments"
+    date.prev_day(date.wday)
   end
+
+pdf = Prawn::Document.new(margin: RIGHT_PAGE_MARGINS, print_scaling: :none)
+pdf.font_families.update(FONTS)
+pdf.font(FONTS.keys.first)
+pdf.stroke_color MEDIUM_COLOR
+pdf.line_width(0.5)
+
+WEEKS.times do |week|
+  unless week.zero?
+    begin_new_page pdf, :right
+  end
+
+  monday = sunday.next_day(1)
+  friday = sunday.next_day(5)
+  saturday = sunday.next_day(6)
+  next_sunday = sunday.next_day(7)
+
+  # Quarterly goals
+  if sunday.month != next_sunday.month && (next_sunday.month % 3) == Q1_START_MONTH
+    first = Date.new(next_sunday.year, next_sunday.month, 1)
+    last = first.next_month(3).prev_day
+    puts "Q#{quarter(first)} quarterly goals page for: #{first.strftime(DATE_FULL_START)}#{last.strftime(DATE_FULL_END)}"
+    quarter_ahead(pdf, first, last)
+  end
+
+  puts "Generate pages for week #{monday.strftime('%W')}: #{monday.strftime(DATE_FULL_START)}#{next_sunday.strftime(DATE_FULL_END)} in #{FILE_NAME}"
+
+  # Weekly goals
+  week_ahead_page pdf, monday, friday
+
+  # Daily pages
+  (1..5).each do |i|
+    day = sunday.next_day(i)
+    daily_tasks_page pdf, day
+    daily_calendar_page pdf, day
+  end
+
+  # Weekend page
+  weekend_page pdf, saturday, next_sunday
+
+  OOOS_BY_WDAY
+    .each_with_index
+    .reject { |names, _| names.nil? }
+    .flat_map { |names, wday| names.map {|name| [name, sunday.next_day(wday)] } }
+    .sort_by { |name, date| "#{name}#{date.iso8601}" } # Sort by name or date, as you like
+    .each { |name, date| one_on_one_page pdf, name, date }
+
+  sunday = next_sunday
 end
+
+pdf.render_file FILE_NAME
+
 
