@@ -30,12 +30,12 @@ bundle install
 
 ## Usage
 
-It assumes you want to generate pages for the next week so there are no options:
+You can generate planner pages for the current week:
 ```
 ./planner.rb
 ```
 
-You can generate pages for a different weeks by passing in the date:
+Or, you can generate a different week's pages by passing in the date:
 ```
 ./planner.rb 2022-05-27
 ```
@@ -43,6 +43,16 @@ You can generate pages for a different weeks by passing in the date:
 On a Mac you can send the PDF directly to your printer:
 ```
 lpr time_block_pages.pdf
+```
+
+The script that generates the 1-on-1 forms works similarly:
+```
+./one-on-one.rb
+```
+
+Similarly, you can choose a week:
+```
+./one-on-one.rb 2022-05-27
 ```
 
 ## Limitations
