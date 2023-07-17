@@ -25,7 +25,7 @@ RIGHT_PAGE_MARGINS = [36, 36, 36, 72]
 
 # Adjust the quarters to a fiscal year, 1 for Jan, 2 for Feb, etc.
 Q1_START_MONTH = 2
-QUARTERS_BY_MONTH = (1..12).map { |month| (month / 3.0).ceil }.rotate(Q1_START_MONTH - 1).unshift(nil)
+QUARTERS_BY_MONTH = (1..12).map { |month| (month / 3.0).ceil }.rotate(1 - Q1_START_MONTH).unshift(nil)
 
 # Use these if you have sprints of a weekly interval
 SPRINT_EPOCH = Date.parse('2023-01-04')
