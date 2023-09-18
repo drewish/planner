@@ -6,8 +6,9 @@ FILE_NAME = "one-on-one_forms.pdf"
 def one_on_one_page pdf, name, date
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
-  pdf.define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
-  # grid.show_all
+  total_row_count = header_row_count + body_row_count
+  pdf.define_grid(columns: COLUMN_COUNT, rows: total_row_count, gutter: 0)
+  # pdf.grid.show_all
 
   pdf.grid([0, 0],[1, 1]).bounding_box do
     pdf.text name, heading_format(align: :left)
@@ -22,14 +23,10 @@ def one_on_one_page pdf, name, date
   sections = {
     2 => "Personal/Notes: <color rgb='#{MEDIUM_COLOR}'>(Spouse, children, pets, hobbies, friends, history, etc.)</color>",
     5 => "Their Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you take from their “10 minutes”)</color>",
-    14 => "My Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you make to prepare for your “10 minutes”)</color>",
-    22 => "Future/Follow Up: <color rgb='#{MEDIUM_COLOR}'>(Where are they headed? Items that you will review at the next 1-on-1)</color>",
+    15 => "My Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you make to prepare for your “10 minutes”)</color>",
+    24 => "Future/Follow Up: <color rgb='#{MEDIUM_COLOR}'>(Where are they headed? Items that you will review at the next 1-on-1)</color>",
   }
-
-  footer_start = 25
-  footer_end = 29
-
-  (2...footer_start).each do |row|
+  (2..body_row_count).each do |row|
     pdf.grid([row, 0],[row, 3]).bounding_box do
       if sections[row]
         pdf.text sections[row], inline_format: true, valign: :bottom
@@ -39,10 +36,16 @@ def one_on_one_page pdf, name, date
     end
   end
 
-  pdf.grid([footer_start, 0],[footer_start, 3]).bounding_box do
-    pdf.text "Questions to Ask:", valign: :bottom, color: MEDIUM_COLOR
+  # Back of the page
+  begin_new_page pdf, :left
+
+  question_start = 0
+  question_end = question_start + 4
+
+  pdf.grid([question_start, 0],[question_start, 3]).bounding_box do
+    pdf.text "Questions to Ask:", valign: :bottom, color: DARK_COLOR
   end
-  pdf.grid([footer_start + 1, 0],[footer_end, 1]).bounding_box do
+  pdf.grid([question_start + 1, 0],[question_end, 1]).bounding_box do
     pdf.text "• Tell me about what you’ve been working on.\n" +
       "• Tell me about your week – what’s it been like?\n" +
       "• Tell me about your family/weekend/activities?\n" +
@@ -51,7 +54,7 @@ def one_on_one_page pdf, name, date
       "• What questions do you have about the project?\n" +
       "• What did ( ) say about this?", size: 10, color: MEDIUM_COLOR
   end
-  pdf.grid([footer_start + 1, 2],[footer_end, 3]).bounding_box do
+  pdf.grid([question_start + 1, 2],[question_end, 3]).bounding_box do
     pdf.text "• Is there anything I need to do, and if so by when?\n" +
       "• How are you going to approach this?\n" +
       "• What do you think you should do?\n" +
@@ -59,9 +62,6 @@ def one_on_one_page pdf, name, date
       "• What can you/we do differently next time?\n" +
       "• Any ideas/suggestions/improvements?", size: 10, color: MEDIUM_COLOR
   end
-
-  # Back of the page
-  begin_new_page pdf, :left
 end
 
 sunday, explanation = parse_start_of_week
