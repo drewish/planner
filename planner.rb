@@ -115,9 +115,9 @@ def quarter_ahead pdf, first_day, last_day
 
   # We let the caller start our page for us but we'll do both sides
   hole_punches pdf
-  notes_page heading_left, subheading_left, heading_right, subheading_right
+  notes_page pdf, heading_left, subheading_left, heading_right, subheading_right
   begin_new_page pdf, :left
-  notes_page heading_left, subheading_left, heading_right, subheading_right
+  notes_page pdf, heading_left, subheading_left, heading_right, subheading_right
   begin_new_page pdf, :right
 end
 
