@@ -143,7 +143,7 @@ def notes_page pdf, heading_left, subheading_left = nil, heading_right = nil, su
   last_row = header_row_count + body_row_count - 1
 
   pdf.define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
-  # grid.show_all
+  # pdf.grid.show_all
 
   # Header Left
   if heading_left
@@ -193,7 +193,7 @@ def daily_tasks_page pdf, date
   last_row = header_row_count + body_row_count - 1
 
   pdf.define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
-  # grid.show_all
+  # pdf.grid.show_all
 
   # Header
   left_header = date.strftime(DATE_LONG) # date.strftime("Week %W")
@@ -254,7 +254,8 @@ def daily_tasks_page pdf, date
   checkbox_padding = 6
   checkbox_size = pdf.grid.row_height - (2 * checkbox_padding)
   (6..last_row).each_with_index do |row, index|
-    pdf.grid(row, 0).bounding_box do
+    # Make the box wider than needed to avoid wrapping if the task name is too long
+    pdf.grid([row, 0], [row, 4]).bounding_box do
       draw_checkbox pdf, checkbox_size, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
     end
   end
@@ -354,7 +355,7 @@ def weekend_page pdf, saturday, sunday
   ].each do |date, point, options|
     pdf.bounding_box(point, options) do
       pdf.define_grid(columns: 2, rows: body_row_count, gutter: 0)
-      # grid.show_all
+      # pdf.grid.show_all
 
       # Header
       left_header = date.strftime("%A")
