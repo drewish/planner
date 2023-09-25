@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require_relative './shared'
-FILE_NAME = "time_block_pages.pdf"
+FILE_NAME = ARGV[1] || 'time_block_pages.pdf'
 
 # From https://stackoverflow.com/a/24753003/203673
 #
