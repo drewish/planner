@@ -24,7 +24,7 @@ def one_on_one_page pdf, name, date
     2 => "Personal/Notes: <color rgb='#{MEDIUM_COLOR}'>(Spouse, children, pets, hobbies, friends, history, etc.)</color>",
     5 => "Their Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you take from their “10 minutes”)</color>",
     15 => "My Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you make to prepare for your “10 minutes”)</color>",
-    24 => "Future/Follow Up: <color rgb='#{MEDIUM_COLOR}'>(Where are they headed? Items that you will review at the next 1-on-1)</color>",
+    24 => "Future/Follow Up: <color rgb='#{MEDIUM_COLOR}'>(Where are they headed? Items to review at the next 1:1)</color>",
   }
   (2..body_row_count).each do |row|
     pdf.grid([row, 0],[row, 3]).bounding_box do
@@ -72,6 +72,7 @@ next_sunday = sunday.next_day(7)
 puts "Generating one-on-one forms for #{monday.strftime(DATE_FULL_START)}#{next_sunday.strftime(DATE_FULL_END)} into #{FILE_NAME}"
 
 pdf = init_pdf
+hole_punches pdf
 
 OOOS_BY_WDAY
   .each_with_index
