@@ -59,6 +59,23 @@ def subheading_format(overrides = {})
   { size: 12, color: MEDIUM_COLOR }.merge(overrides)
 end
 
+def draw_checkbox pdf, checkbox_size, checkbox_padding, label = nil
+  no_label = label.nil? || label.empty?
+  original_color = pdf.stroke_color
+  pdf.stroke_color(LIGHT_COLOR)
+  pdf.dash([1, 2], phase: 0.5) if no_label
+  pdf.rectangle [pdf.bounds.top_left[0] + checkbox_padding, pdf.bounds.top_left[1] - checkbox_padding], checkbox_size, checkbox_size
+  pdf.stroke
+  pdf.undash if no_label
+  pdf.stroke_color(original_color)
+
+  unless no_label
+    pdf.translate checkbox_size + (2 * checkbox_padding), 0 do
+      pdf.text label, color: MEDIUM_COLOR, valign: :center
+    end
+  end
+end
+
 # Caller needs to start the page, so this could be the first page.
 def notes_page pdf, heading_left, subheading_left = nil, heading_right = nil, subheading_right = nil
   header_row_count = 2

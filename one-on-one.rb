@@ -3,6 +3,20 @@
 require_relative './shared'
 FILE_NAME = "one-on-one_forms.pdf"
 
+
+def sections pdf, first_row, last_row, headings
+  (first_row..last_row).each do |row|
+    pdf.grid([row, 0],[row, 3]).bounding_box do
+      if headings[row]
+        pdf.text headings[row], inline_format: true, valign: :bottom
+      else
+        pdf.stroke_line pdf.bounds.bottom_left, pdf.bounds.bottom_right
+      end
+    end
+  end
+end
+
+
 def one_on_one_page pdf, name, date
   header_row_count = 2
   body_row_count = HOUR_COUNT * 2
@@ -20,26 +34,29 @@ def one_on_one_page pdf, name, date
   #   text "right heading", heading_format(align: :right)
   # end
 
-  sections = {
+  sections(pdf, 2, body_row_count, {
     2 => "Personal/Notes: <color rgb='#{MEDIUM_COLOR}'>(Spouse, children, pets, hobbies, friends, history, etc.)</color>",
     5 => "Their Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you take from their “10 minutes”)</color>",
     15 => "My Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you make to prepare for your “10 minutes”)</color>",
     24 => "Future/Follow Up: <color rgb='#{MEDIUM_COLOR}'>(Where are they headed? Items to review at the next 1:1)</color>",
-  }
-  (2..body_row_count).each do |row|
-    pdf.grid([row, 0],[row, 3]).bounding_box do
-      if sections[row]
-        pdf.text sections[row], inline_format: true, valign: :bottom
-      else
-        pdf.stroke_line pdf.bounds.bottom_left, pdf.bounds.bottom_right
-      end
-    end
-  end
+  })
 
   # Back of the page
   begin_new_page pdf, :left
 
-  question_start = 0
+  pdf.grid([0, 0],[1, 1]).bounding_box do
+    pdf.text name, heading_format(align: :left)
+  end
+  pdf.grid([1, 0],[1, 1]).bounding_box do
+    pdf.text date.strftime(DATE_LONG), subheading_format(align: :left)
+  end
+
+  sections(pdf, 2, 15, {
+    2 => "Feedback:",
+  })
+
+
+  question_start = 25
   question_end = question_start + 4
 
   pdf.grid([question_start, 0],[question_start, 3]).bounding_box do

@@ -88,23 +88,6 @@ def quarter(date)
   QUARTERS_BY_MONTH[date.month]
 end
 
-def draw_checkbox pdf, checkbox_size, checkbox_padding, label = nil
-  no_label = label.nil? || label.empty?
-  original_color = pdf.stroke_color
-  pdf.stroke_color(LIGHT_COLOR)
-  pdf.dash([1, 2], phase: 0.5) if no_label
-  pdf.rectangle [pdf.bounds.top_left[0] + checkbox_padding, pdf.bounds.top_left[1] - checkbox_padding], checkbox_size, checkbox_size
-  pdf.stroke
-  pdf.undash if no_label
-  pdf.stroke_color(original_color)
-
-  unless no_label
-    pdf.translate checkbox_size + (2 * checkbox_padding), 0 do
-      pdf.text label, color: MEDIUM_COLOR, valign: :center
-    end
-  end
-end
-
 # * * *
 
 def quarter_ahead pdf, first_day, last_day
