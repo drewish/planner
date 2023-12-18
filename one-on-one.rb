@@ -51,13 +51,13 @@ def one_on_one_page pdf, name, date
     pdf.text date.strftime(DATE_LONG), subheading_format(align: :left)
   end
 
-  sections(pdf, 2, 15, {
-    2 => "Feedback:",
-  })
-
-
   question_start = 25
   question_end = question_start + 4
+
+  sections(pdf, 2, question_start - 1, {
+    2 => "Additional Notes:",
+    20 => "Feedback:",
+  })
 
   pdf.grid([question_start, 0],[question_start, 3]).bounding_box do
     pdf.text "Questions to Ask:", valign: :bottom, color: DARK_COLOR
