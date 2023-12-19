@@ -55,6 +55,11 @@ Similarly, you can choose a week:
 ./one-on-one.rb 2022-05-27
 ```
 
+Generate a full year. Note: this will also include every week and combine pdfs at the end in folder the folder output
+```
+ruby yearly_planner.rb
+```
+
 ## Limitations
 
 Probably only works on a Mac since it hardcodes the font path.
