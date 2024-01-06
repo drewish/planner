@@ -37,10 +37,10 @@ OOOS_BY_WDAY = [nil, nil, ['Juan'], ['Kelly'], nil, ['Alex', 'Edna'], nil]
 # Repeating tasks by day of week, 0 is Sunday. Nested index is the row.
 TASKS_BY_WDAY = [
   { 0 => 'Plan meals' },
-  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
-  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
-  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
-  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
-  { 0 => 'Update standup notes', 12 => 'Italian', 13 => 'Walk dog' },
+  { 0 => 'Update standup notes' },
+  { 0 => 'Update standup notes' },
+  { 0 => 'Update standup notes' },
+  { 0 => 'Update standup notes' },
+  { 0 => 'Update standup notes' },
   { 0 => 'Plan next week' },
 ]

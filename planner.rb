@@ -159,16 +159,14 @@ def notes_page pdf, heading_left, subheading_left = nil, heading_right = nil, su
   end
 
   # Checkboxes
-  checkbox_padding = 6
-  checkbox_size = pdf.grid.row_height - (2 * checkbox_padding)
   ((first_row + 1)..last_row).each do |row|
     pdf.grid(row, 0).bounding_box do
-      draw_checkbox pdf, checkbox_size, checkbox_padding
+      draw_checkbox pdf
     end
   end
 end
 
-def daily_tasks_page pdf, date
+def daily_tasks_page pdf, date, metrics_rows = 5
   begin_new_page pdf, :left
 
   header_row_count = 2
@@ -189,45 +187,44 @@ def daily_tasks_page pdf, date
   end
 
   # Daily metrics
-  pdf.grid([1, 0], [4, 3]).bounding_box do
-    pdf.dash [1, 2]
-    pdf.stroke_bounds
-    pdf.undash
+  if metrics_rows > 0
+    pdf.grid([1, 0], [metrics_rows, 3]).bounding_box do
+      pdf.dash [1, 2]
+      pdf.stroke_bounds
+      pdf.undash
 
-    pdf.translate 10, -10 do
-      pdf.text "Daily Metrics", color: MEDIUM_COLOR
+      pdf.translate 6, -6 do
+        pdf.text "Daily Metrics", color: MEDIUM_COLOR
+      end
     end
 
-    pdf.stroke do
-      pdf.rectangle [pdf.bounds.bottom_right[0] - 20, pdf.bounds.bottom_right[1] + 20], 10, 10
-    end
-
-    pdf.translate -27, 7 do
-      pdf.text "Shutdown Complete", color: MEDIUM_COLOR, align: :right, valign: :bottom
+    pdf.grid([metrics_rows, 2], [metrics_rows, 3]).bounding_box do
+      draw_checkbox pdf, 6, "Shutdown Complete"
     end
   end
 
   # Tasks / Notes
-  pdf.grid([5, 0], [5, 1]).bounding_box do
+  task_note_start = metrics_rows + 1
+  pdf.grid([task_note_start, 0], [task_note_start, 1]).bounding_box do
     pdf.translate 6, 0 do
       pdf.text "Tasks:", color: DARK_COLOR, valign: :center
     end
   end
-  pdf.grid([5, 2], [5, 3]).bounding_box do
+  pdf.grid([task_note_start, 2], [task_note_start, 3]).bounding_box do
     pdf.translate 6, 0 do
       pdf.text "Notes:", color: DARK_COLOR, valign: :center
     end
   end
 
   # Horizontal lines
-  (5..last_row).each do |row|
+  (task_note_start..last_row).each do |row|
     pdf.grid([row, 0], [row, 3]).bounding_box do
       pdf.stroke_line pdf.bounds.bottom_left, pdf.bounds.bottom_right
     end
   end
 
   # Vertical line
-  pdf.grid([6, 1], [last_row, 1]).bounding_box do
+  pdf.grid([task_note_start + 1, 1], [last_row, 1]).bounding_box do
     pdf.dash [1, 2], phase: 2
     pdf.stroke_line(pdf.bounds.top_right, pdf.bounds.bottom_right)
     pdf.undash
@@ -235,11 +232,10 @@ def daily_tasks_page pdf, date
 
   # Checkboxes
   checkbox_padding = 6
-  checkbox_size = pdf.grid.row_height - (2 * checkbox_padding)
-  (6..last_row).each_with_index do |row, index|
+  ((task_note_start + 1)..last_row).each_with_index do |row, index|
     # Make the box wider than needed to avoid wrapping if the task name is too long
     pdf.grid([row, 0], [row, 4]).bounding_box do
-      draw_checkbox pdf, checkbox_size, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
+      draw_checkbox pdf, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
     end
   end
 end
@@ -369,10 +365,9 @@ def weekend_page pdf, saturday, sunday
 
       # Checkboxes
       checkbox_padding = 6
-      checkbox_size = pdf.grid.row_height - (2 * checkbox_padding)
       ((task_start_row + 1)..task_last_row).each_with_index do |row, index|
         pdf.grid(row, 0).bounding_box do
-          draw_checkbox pdf, checkbox_size, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
+          draw_checkbox pdf, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
         end
       end
 

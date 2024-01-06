@@ -59,7 +59,8 @@ def subheading_format(overrides = {})
   { size: 12, color: MEDIUM_COLOR }.merge(overrides)
 end
 
-def draw_checkbox pdf, checkbox_size, checkbox_padding, label = nil
+def draw_checkbox pdf, checkbox_padding = 6, label = nil
+  checkbox_size = pdf.grid.row_height - (2 * checkbox_padding)
   no_label = label.nil? || label.empty?
   original_color = pdf.stroke_color
   pdf.stroke_color(LIGHT_COLOR)
@@ -119,11 +120,9 @@ def notes_page pdf, heading_left, subheading_left = nil, heading_right = nil, su
   end
 
   # Checkboxes
-  checkbox_padding = 6
-  checkbox_size = pdf.grid.row_height - (2 * checkbox_padding)
   ((first_row + 1)..last_row).each do |row|
     pdf.grid(row, 0).bounding_box do
-      draw_checkbox pdf, checkbox_size, checkbox_padding
+      draw_checkbox pdf
     end
   end
 end
