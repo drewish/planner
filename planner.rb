@@ -272,11 +272,21 @@ def daily_calendar_page pdf, date
     pdf.text right_subhed, subheading_format(align: :right)
   end
 
-  # Hour labels
   (0...HOUR_COUNT).each do |hour|
-    pdf.grid(hour * 2 + fist_hour_row, -1).bounding_box do
-      if HOUR_LABELS[hour]
-        pdf.translate(-4, 0) { pdf.text HOUR_LABELS[hour].to_s, align: :right, valign: :center }
+    row = hour * 2 + fist_hour_row
+    # Hour labels
+    if hour_label = HOUR_LABELS[hour]
+      pdf.grid(row, -1).bounding_box do
+        pdf.translate(-4, 0) { pdf.text hour_label.to_s, align: :right, valign: :center }
+      end
+    end
+
+    # Default appointments
+    if appointment_label = APPOINTMENTS_BY_WDAY[date.wday][HOUR_LABELS[hour]]
+      pdf.grid([row, first_column], [row, last_column]).bounding_box do
+        pdf.translate(4, 0) do
+          pdf.text appointment_label.to_s, color: MEDIUM_COLOR, align: :left, valign: :center
+        end
       end
     end
   end
@@ -399,9 +409,18 @@ def weekend_page pdf, saturday, sunday
 
       # Hour labels
       (0...HOUR_COUNT).each do |hour|
-        pdf.grid(hour + hour_start_row + 1, -1).bounding_box do
-          if HOUR_LABELS[hour]
-            pdf.translate(20, 0) { pdf.text HOUR_LABELS[hour].to_s, align: :right, valign: :center }
+        row = hour + hour_start_row + 1
+        if hour_label = HOUR_LABELS[hour]
+          pdf.grid(row, -1).bounding_box do
+            pdf.translate(20, 0) { pdf.text hour_label.to_s, align: :right, valign: :center }
+          end
+        end
+
+        if appointment_label = APPOINTMENTS_BY_WDAY[date.wday][HOUR_LABELS[hour]]
+          pdf.grid([row, 0], [row, 2]).bounding_box do
+            pdf.translate(overhang + 4, 0) {
+              pdf.text appointment_label.to_s, color: MEDIUM_COLOR, align: :left, valign: :center
+            }
           end
         end
       end

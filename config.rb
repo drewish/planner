@@ -1,3 +1,4 @@
+# Hours shown on the day schedule. You can leave nils if you want a blank to write in.
 HOUR_LABELS = [nil, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, nil, nil]
 HOUR_COUNT = HOUR_LABELS.length
 COLUMN_COUNT = 4
@@ -43,4 +44,15 @@ TASKS_BY_WDAY = [
   { 0 => 'Update standup notes' },
   { 0 => 'Update standup notes' },
   { 0 => 'Plan next week' },
+]
+
+# Repeating Appointments by day of week, 0 is Sunday. Nested index is a value in HOUR_LABELS.
+APPOINTMENTS_BY_WDAY = [
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
 ]
