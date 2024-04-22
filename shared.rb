@@ -2,6 +2,7 @@ require 'prawn'
 require 'prawn/measurement_extensions'
 require 'pry'
 require 'date'
+require 'i18n'
 
 require_relative './config'
 

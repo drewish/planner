@@ -19,14 +19,23 @@ FONTS = {
     condensed: { file: OSX_FONT_PATH, font: 'Futura Condensed Medium' },
   }
 }
-PAGE_SIZE = 'LETTER' # Could also do 'A4'
+PAGE_SIZE = 'A4' # Could also do 'A4'
 # Order is top, right, bottom, left
 LEFT_PAGE_MARGINS = [36, 72, 36, 36]
 RIGHT_PAGE_MARGINS = [36, 36, 36, 72]
 
+# Load internationalization strings
+I18n.load_path += Dir[File.join(__dir__, 'config', 'locales', '*.{rb,yml}')]
+I18n.available_locales = [:de, :en]
+I18n.default_locale = :de
+
 # Adjust the quarters to a fiscal year, 1 for Jan, 2 for Feb, etc.
-Q1_START_MONTH = 2
+Q1_START_MONTH = 1
 QUARTERS_BY_MONTH = (1..12).map { |month| (month / 3.0).ceil }.rotate(1 - Q1_START_MONTH).unshift(nil)
+
+# Adjust the start of semesters
+SUMMER_SEMESTER_START = 4 # April
+WINTER_SEMESTER_START = 10 # October
 
 # Use these if you have sprints of a weekly interval
 SPRINT_EPOCH = Date.parse('2023-01-04')

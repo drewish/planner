@@ -1,0 +1,38 @@
+en:
+  date:
+    day_names: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
+    abbr_day_names: [Su, Mo, Tu, We, Th, Fr, Sa]
+    month_names: [~, January, February, March, April, May, June, July, August, September, October, November, December]
+    abbr_month_names: [~, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
+    formats:
+      default: "%m/%d/%Y"
+      short: "%b %d"
+      long: "%B %d, %Y"
+      weekday: "%A"
+      year: "%Y"
+      short_date: "%B %-d"
+      left_range: "%A, %B %-d"
+      right_range: "%A, %B %-d, %Y"
+  last_business_day_of_year: "last business day of the year"
+  one_more_business_day_in_year: "one more business day in the year"
+  business_days_in_year: "%{count} business days in the year"
+  last_sprint_day: "last day in the sprint"
+  one_day_left_in_sprint: "one more day in the sprint"
+  days_left_in_sprint: "%{count} more days in the sprint"
+  notes: "Notes:"
+  tasks: "Tasks:"
+  daily_metrics: "Daily Metrics"
+  shutdown_complete: "Shutdown complete"
+  semester: "Semester"
+  quarter: "Quarter"
+  week: "Week"
+  day: "Day"
+  upcoming_week: "The upcoming week"
+  semester_plan: "Semester plan"
+  quarter_plan: "Quarterly plan"
+  summer: "Summer semester"
+  winter: "Winter semester"
+  document_title: "Semesterplan"
+  content_outline: "Outline of content"
+  semester_overview: "Semester overview"
+  weekly_overview: "Weekly overviews"
