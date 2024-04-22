@@ -44,7 +44,22 @@ de:
   my_update: "Mein Update"
   my_update_instructions: "Notizen als Vorbereitung für meine “10 Minuten”"
   future: "Zukunft/Follow Up"
-  future_instructions: "Was kommt als nächstes?? Dinge für das nächste 1:1"
+  future_instructions: "Was kommt als nächstes? Dinge für das nächste 1:1"
   additional_notes: "Zusätzliche Notizen"
   feedback: "Feedback"
   questions_to_ask: "Leitfragen"
+  questions_left: |
+    • Tell me about what you’ve been working on.
+    • Tell me about your week – what’s it been like?
+    • Tell me about your family/weekend/activities?
+    • Where are you on ( ) project?
+    • Are you on track to meet the deadline?
+    • What questions do you have about the project?
+    • What did ( ) say about this?
+  questions_right: |
+    • Is there anything I need to do, and if so by when?
+    • How are you going to approach this?
+    • What do you think you should do?
+    • So, you’re going to do “( )” by “( )”, right?
+    • What can you/we do differently next time?
+    • Any ideas/suggestions/improvements?

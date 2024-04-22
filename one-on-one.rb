@@ -63,21 +63,25 @@ def one_on_one_page pdf, name, date
     pdf.text "#{I18n.t('questions_to_ask')}:", valign: :bottom, color: DARK_COLOR
   end
   pdf.grid([question_start + 1, 0],[question_end, 1]).bounding_box do
-    pdf.text "• Tell me about what you’ve been working on.\n" +
-      "• Tell me about your week – what’s it been like?\n" +
-      "• Tell me about your family/weekend/activities?\n" +
-      "• Where are you on ( ) project?\n" +
-      "• Are you on track to meet the deadline?\n" +
-      "• What questions do you have about the project?\n" +
-      "• What did ( ) say about this?", size: 10, color: MEDIUM_COLOR
+    pdf.text I18n.t('questions_left'),
+      #"• Tell me about what you’ve been working on.\n" +
+      #"• Tell me about your week – what’s it been like?\n" +
+      #"• Tell me about your family/weekend/activities?\n" +
+      #"• Where are you on ( ) project?\n" +
+      #"• Are you on track to meet the deadline?\n" +
+      #"• What questions do you have about the project?\n" +
+      #"• What did ( ) say about this?",
+      size: 10, color: MEDIUM_COLOR
   end
   pdf.grid([question_start + 1, 2],[question_end, 3]).bounding_box do
-    pdf.text "• Is there anything I need to do, and if so by when?\n" +
-      "• How are you going to approach this?\n" +
-      "• What do you think you should do?\n" +
-      "• So, you’re going to do “( )” by “( )”, right?\n" +
-      "• What can you/we do differently next time?\n" +
-      "• Any ideas/suggestions/improvements?", size: 10, color: MEDIUM_COLOR
+    pdf.text I18n.t('questions_right'),
+    #  "• Is there anything I need to do, and if so by when?\n" +
+    #  "• How are you going to approach this?\n" +
+    #  "• What do you think you should do?\n" +
+    #  "• So, you’re going to do “( )” by “( )”, right?\n" +
+    #  "• What can you/we do differently next time?\n" +
+    #  "• Any ideas/suggestions/improvements?",
+      size: 10, color: MEDIUM_COLOR
   end
 end
 
