@@ -56,12 +56,14 @@ TASKS_BY_WDAY = [
 ]
 
 # Repeating Appointments by day of week, 0 is Sunday. Nested index is a value in HOUR_LABELS.
-APPOINTMENTS_BY_WDAY = [
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-  {},
-]
+#APPOINTMENTS_BY_WDAY = [
+#  {},
+#  {},
+#  {},
+#  {},
+#  {},
+#  {},
+#  {},
+#]
+
+require_relative './summer'
