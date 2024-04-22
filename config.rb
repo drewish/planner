@@ -19,7 +19,7 @@ FONTS = {
     condensed: { file: OSX_FONT_PATH, font: 'Futura Condensed Medium' },
   }
 }
-PAGE_SIZE = 'A4' # Could also do 'A4'
+PAGE_SIZE = 'LETTER' # Could also do 'A4'
 # Order is top, right, bottom, left
 LEFT_PAGE_MARGINS = [36, 72, 36, 36]
 RIGHT_PAGE_MARGINS = [36, 36, 36, 72]
@@ -38,11 +38,12 @@ SUMMER_SEMESTER_START = 4 # April
 WINTER_SEMESTER_START = 10 # October
 
 # Use these if you have sprints of a weekly interval
+USE_SPRINTS = false
 SPRINT_EPOCH = Date.parse('2023-01-04')
 SPRINT_LENGTH = 14
 
 # Names by day of week, 0 is Sunday.
-OOOS_BY_WDAY = [nil, nil, ['Juan'], ['Kelly'], nil, ['Alex', 'Edna'], nil]
+OOOS_BY_WDAY = [nil, nil, ['Lilian', 'Leonard'], ['Maged','Toni'], ['Hendrik','Marthe'], ['Marvin', 'Jonas'], nil]
 
 # Repeating tasks by day of week, 0 is Sunday. Nested index is the row.
 TASKS_BY_WDAY = [

@@ -28,17 +28,17 @@ def one_on_one_page pdf, name, date
     pdf.text name, heading_format(align: :left)
   end
   pdf.grid([1, 0],[1, 1]).bounding_box do
-    pdf.text date.strftime(DATE_LONG), subheading_format(align: :left)
+    pdf.text I18n.l(date, format: :long), subheading_format(align: :left)
   end
   # grid([0, 2],[0, 3]).bounding_box do
   #   text "right heading", heading_format(align: :right)
   # end
 
   sections(pdf, 2, body_row_count, {
-    2 => "Personal/Notes: <color rgb='#{MEDIUM_COLOR}'>(Spouse, children, pets, hobbies, friends, history, etc.)</color>",
-    5 => "Their Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you take from their “10 minutes”)</color>",
-    15 => "My Update: <color rgb='#{MEDIUM_COLOR}'>(Notes you make to prepare for your “10 minutes”)</color>",
-    24 => "Future/Follow Up: <color rgb='#{MEDIUM_COLOR}'>(Where are they headed? Items to review at the next 1:1)</color>",
+    2 => "#{I18n.t('personal_notes')}: <color rgb='#{MEDIUM_COLOR}'>(#{I18n.t('personal_notes_example')})</color>",
+    5 => "#{I18n.t('their_update')}: <color rgb='#{MEDIUM_COLOR}'>(#{I18n.t('their_update_instructions')})</color>",
+    15 => "#{I18n.t('my_update')}: <color rgb='#{MEDIUM_COLOR}'>(#{I18n.t('my_update_instructions')})</color>",
+    24 => "#{I18n.t('future')}: <color rgb='#{MEDIUM_COLOR}'>(#{I18n.t('future_instructions')})</color>",
   })
 
   # Back of the page
@@ -48,19 +48,19 @@ def one_on_one_page pdf, name, date
     pdf.text name, heading_format(align: :left)
   end
   pdf.grid([1, 0],[1, 1]).bounding_box do
-    pdf.text date.strftime(DATE_LONG), subheading_format(align: :left)
+    pdf.text I18n.l(date, format: :long), subheading_format(align: :left)
   end
 
   question_start = 25
   question_end = question_start + 4
 
   sections(pdf, 2, question_start - 1, {
-    2 => "Additional Notes:",
-    20 => "Feedback:",
+    2 => "#{I18n.t('additional_notes')}:",
+    20 => "#{I18n.t('feedback')}:",
   })
 
   pdf.grid([question_start, 0],[question_start, 3]).bounding_box do
-    pdf.text "Questions to Ask:", valign: :bottom, color: DARK_COLOR
+    pdf.text "#{I18n.t('questions_to_ask')}:", valign: :bottom, color: DARK_COLOR
   end
   pdf.grid([question_start + 1, 0],[question_end, 1]).bounding_box do
     pdf.text "• Tell me about what you’ve been working on.\n" +
@@ -102,5 +102,3 @@ OOOS_BY_WDAY
   }
 
 pdf.render_file FILE_NAME
-
-
