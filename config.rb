@@ -43,17 +43,17 @@ SPRINT_EPOCH = Date.parse('2023-01-04')
 SPRINT_LENGTH = 14
 
 # Names by day of week, 0 is Sunday.
-OOOS_BY_WDAY = [nil, nil, ['Lilian', 'Leonard'], ['Maged','Toni'], ['Hendrik','Marthe'], ['Marvin', 'Jonas'], nil]
+OOOS_BY_WDAY = [nil, nil, ['Hendrik', 'Marvin', 'Maged', 'Marthe' ], ['Toni'], ['Leonard','Lilian'], nil, nil]
 
 # Repeating tasks by day of week, 0 is Sunday. Nested index is the row.
 TASKS_BY_WDAY = [
-  { 0 => 'Plan meals' },
-  { 0 => 'Update standup notes' },
-  { 0 => 'Update standup notes' },
-  { 0 => 'Update standup notes' },
-  { 0 => 'Update standup notes' },
-  { 0 => 'Update standup notes' },
-  { 0 => 'Plan next week' },
+  { 0 => 'Wochenplan' }, # Sonntag
+  { 0 => 'Unterschriftenmappe', 1 => 'Fragen für die Profrunde', 2 => 'ForschMedi updaten'}, # Montag
+  { 0 => 'Unterschriftenmappe', 1 => 'Standup-Notizen (Hendrik, Marthe, Marvin, Maged)', 2 => 'SMNF Folien'}, # Dienstag
+  { 0 => 'Unterschriftenmappe', 1 => 'OSE check', 2 => 'Standup-Notizen (Toni)', 3 =>  'Jour-Fixe Agenda'}, # Mittwoch
+  { 0 => 'Unterschriftenmappe', 1 => 'Standup-Notizen (Leonard, Lilian)', 2 => 'SMNF updaten'}, # Donnerstag
+  { 0 => 'Unterschriftenmappe', 16 => 'Week-Shutdown'},
+  { 0 => 'Sport' },
 ]
 
 # Repeating Appointments by day of week, 0 is Sunday. Nested index is a value in HOUR_LABELS.

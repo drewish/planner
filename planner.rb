@@ -314,6 +314,10 @@ def daily_calendar_page pdf, date
         end
       end
     end
+
+
+
+
   end
 
   # Horizontal lines
