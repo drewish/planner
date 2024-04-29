@@ -57,11 +57,14 @@ def business_days_left_in_year(date)
   days = business_days_between(date, Date.new(date.year, 12, 31))
   case days
   when 0
-    "last work day of the year"
+    #"letzter Arbeitstag im Jahr"
+    I18n.t('last_business_day_of_year')
   when 1
-    "1 work day left in the year"
+    #"1 weiterer Arbeitstag im Jahr"
+    I18n.t('one_more_business_day_in_year')
   else
-    "#{days} work days in the year"
+    #"#{days} Arbeitstage im Jahr"
+    I18n.t('business_days_in_year', count: days)
   end
 end
 
@@ -76,11 +79,14 @@ def business_days_left_in_sprint(date)
   days = business_days_between(date, sprint_end)
   case days
   when 0
-    "last work day of sprint"
+    #"last day of sprint"
+    I18n.t('last_sprint_day')
   when 1
-    "1 work day left in sprint"
+    #"1 day left in sprint"
+    I18n.t('one_day_left_in_sprint')
   else
-    "#{days} work days left in sprint"
+    #"#{days} days left in sprint"
+    I18n.t('days_left_in_sprint', count: days)
   end
 end
 
@@ -88,12 +94,23 @@ def quarter(date)
   QUARTERS_BY_MONTH[date.month]
 end
 
+# pick summer or winter semester depending on the month
+def semester_year(date)
+  if date.month >= SUMMER_SEMESTER_START && date.month < WINTER_SEMESTER_START
+    res = I18n.l(date, format: :year)
+  else
+    res = I18n.l(date, format: :year) << " / " << I18n.l(date.next_year, format: :year)
+  end
+  res
+end
+
 # * * *
 
 def quarter_ahead pdf, first_day, last_day
-  heading_left = "Quarterly Plan"
-  subheading_left = "#{first_day.strftime(DATE_FULL_START)}#{last_day.strftime(DATE_FULL_END)}"
-  heading_right = "Quarter #{quarter(first_day)}"
+  heading_left = I18n.t('quartely_plan')
+  subheading_left = "#{I18n.l(first_day, format: :left_range)} — #{I18n.l(last_day, format: :right_range)}"
+  quarter_str = I18n.t('quarter')
+  heading_right = "#{quarter_str} #{quarter(first_day)}"
   subheading_right = last_day.strftime('%Y')
 
   # We let the caller start our page for us but we'll do both sides
@@ -105,10 +122,12 @@ def quarter_ahead pdf, first_day, last_day
 end
 
 def week_ahead_page pdf, first_day, last_day
-  heading_left = "Weekly Plan"
-  subheading_left = "#{first_day.strftime(DATE_FULL_START)}#{last_day.strftime(DATE_FULL_END)}"
-  heading_right = first_day.strftime("Week %W")
-  subheading_right = "Quarter #{quarter(first_day)}"
+  heading_left = I18n.t('upcoming_week')
+  subheading_left = "#{I18n.l(first_day, format: :left_range)} — #{I18n.l(last_day, format: :right_range)}"
+  week_str = I18n.t('week')
+  heading_right = first_day.strftime("#{week_str} %W")
+  quarter_str = I18n.t('quarter')
+  subheading_right = "#{quarter_str} #{quarter(first_day)}"
 
   # We don't start our own page since we don't know if this is the first week or one
   # of several weeks in a file.
@@ -177,8 +196,8 @@ def daily_tasks_page pdf, date, metrics_rows = 5
   # pdf.grid.show_all
 
   # Header
-  left_header = date.strftime(DATE_LONG) # date.strftime("Week %W")
-  right_header = date.strftime("%A") # date.strftime("Day %j")
+  left_header = I18n.l(date, format: :long) # date.strftime(DATE_LONG) # date.strftime("Week %W")
+  right_header = I18n.l(date, format: :weekday) # date.strftime("%A") # date.strftime("Day %j")
   pdf.grid([0, 0],[1, 2]).bounding_box do
     pdf.text left_header, heading_format(align: :left)
   end
@@ -194,12 +213,12 @@ def daily_tasks_page pdf, date, metrics_rows = 5
       pdf.undash
 
       pdf.translate 6, -6 do
-        pdf.text "Daily Metrics", color: MEDIUM_COLOR
+        pdf.text I18n.t('daily_metrics'), color: MEDIUM_COLOR
       end
     end
 
     pdf.grid([metrics_rows, 2], [metrics_rows, 3]).bounding_box do
-      draw_checkbox pdf, 6, "Shutdown Complete"
+      draw_checkbox pdf, 6, I18n.t('shutdown_complete')
     end
   end
 
@@ -207,12 +226,12 @@ def daily_tasks_page pdf, date, metrics_rows = 5
   task_note_start = metrics_rows + 1
   pdf.grid([task_note_start, 0], [task_note_start, 1]).bounding_box do
     pdf.translate 6, 0 do
-      pdf.text "Tasks:", color: DARK_COLOR, valign: :center
+      pdf.text I18n.t('tasks'), color: DARK_COLOR, valign: :center
     end
   end
   pdf.grid([task_note_start, 2], [task_note_start, 3]).bounding_box do
     pdf.translate 6, 0 do
-      pdf.text "Notes:", color: DARK_COLOR, valign: :center
+      pdf.text I18n.t('notes'), color: DARK_COLOR, valign: :center
     end
   end
 
@@ -253,10 +272,13 @@ def daily_calendar_page pdf, date
   pdf.define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
 
   # Header
-  left_header = date.strftime(DATE_LONG)
+  left_header = I18n.l(date, format: :long) # date.strftime(DATE_LONG)
   # right_header = date.strftime("Day %j")
-  right_header = date.strftime("%A")
-  left_subhed = date.strftime("Quarter #{quarter(date)} Week %W Day %j")
+  right_header = I18n.l(date, format: :weekday) # date.strftime("%A")
+  quarter_str = I18n.t('quarter')
+  week_str = I18n.t('week')
+  day_str = I18n.t('day')
+  left_subhed = date.strftime("#{quarter_str} #{quarter(date)} #{week_str} %W #{day_str} %j")
   # right_subhed = business_days_left_in_year(date)
   right_subhed = business_days_left_in_sprint(date)
   pdf.grid([0, first_column],[1, 1]).bounding_box do
@@ -347,8 +369,10 @@ def weekend_page pdf, saturday, sunday
       # pdf.grid.show_all
 
       # Header
-      left_header = date.strftime("%A")
-      left_sub_header = date.strftime(DATE_LONG)
+      #left_header = date.strftime("%A")
+      #left_sub_header = date.strftime(DATE_LONG)
+      left_header = I18n.l(date, format: :weekday)
+      left_sub_header = I18n.l(date, format: :short_date)
       pdf.grid([0, 0],[0, 1]).bounding_box do
         pdf.text left_header, heading_format(align: :left)
       end
@@ -362,7 +386,7 @@ def weekend_page pdf, saturday, sunday
       # Task lable
       pdf.grid([task_start_row, 0], [task_start_row, 1]).bounding_box do
         pdf.translate 6, 0 do
-          pdf.text "Tasks:", color: DARK_COLOR, valign: :center
+          pdf.text I18n.t('tasks'), color: DARK_COLOR, valign: :center
         end
       end
 

@@ -1,0 +1,38 @@
+de:
+  date:
+    day_names: [Sonntag, Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag]
+    abbr_day_names: [So, Mo, Di, Mi, Do, Fr, Sa]
+    month_names: [~, Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober, November, Dezember]
+    abbr_month_names: [~, Jan, Feb, Mär, Apr, Mai, Jun, Jul, Aug, Sep, Okt, Nov, Dez]
+    formats:
+      default: "%d.%m.%Y"
+      short: "%d. %b"
+      long: "%d. %B %Y"
+      weekday: "%A"
+      year: "%Y"
+      short_date: " %-d. %B"
+      left_range: "%A, %-d. %B "
+      right_range: "%A, %-d. %B, %Y"
+  last_business_day_of_year: "letzter Arbeitstag im Jahr"
+  one_more_business_day_in_year: "ein weiterer Arbeitstag im Jahr"
+  business_days_in_year: "%{count} Arbeitstage im Jahr"
+  last_sprint_day: "letzter Tag im Sprint"
+  one_day_left_in_sprint: "ein weiterer Tag im Sprint"
+  days_left_in_sprint: "%{count} weitere Tage im Sprint"
+  notes: "Notizen:"
+  tasks: "Aufgaben:"
+  daily_metrics: "Daily Metrics"
+  shutdown_complete: "Shutdown complete"
+  semester: "Semester"
+  quarter: "Quartal"
+  week: "Woche"
+  day: "Tag"
+  upcoming_week: "Die bevorstehende Woche"
+  semester_plan: "Semesterplan"
+  quarter_plan: "Quartalsplan"
+  summer: "Sommersemester"
+  winter: "Wintersemester"
+  document_title: "Semesterplan"
+  content_outline: "Inhaltsübersicht"
+  semester_overview: "Semesterübersicht"
+  weekly_overview: "Wochenübersicht"
