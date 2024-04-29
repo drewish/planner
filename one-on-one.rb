@@ -81,26 +81,36 @@ def one_on_one_page pdf, name, date
   end
 end
 
-sunday, explanation = parse_start_of_week
-puts explanation
 
-monday = sunday.next_day(1)
-next_sunday = sunday.next_day(7)
-puts "Generating one-on-one forms for #{monday.strftime(DATE_FULL_START)}#{next_sunday.strftime(DATE_FULL_END)} into #{FILE_NAME}"
+options = parse_options
+puts options[:date_source]
+sunday = options[:date]
 
 pdf = init_pdf
-hole_punches pdf
 
-OOOS_BY_WDAY
-  .each_with_index
-  .reject { |names, _| names.nil? }
-  .flat_map { |names, wday| names.map {|name| [name, sunday.next_day(wday)] } }
-  .sort_by { |name, date| "#{name}#{date.iso8601}" } # Sort by name or date, as you like
-  .each_with_index { |name_and_date, index|
-    begin_new_page(pdf, :right) unless index.zero?
-    one_on_one_page(pdf, *name_and_date)
-  }
+options[:weeks].times do |week|
+  begin_new_page(pdf, :right) unless week.zero?
 
+  monday = sunday.next_day(1)
+  next_sunday = sunday.next_day(7)
+  puts "Generating one-on-one forms for #{monday.strftime(DATE_FULL_START)}#{next_sunday.strftime(DATE_FULL_END)}"
+
+  hole_punches pdf
+
+  OOOS_BY_WDAY
+    .each_with_index
+    .reject { |names, _| names.nil? }
+    .flat_map { |names, wday| names.map {|name| [name, sunday.next_day(wday)] } }
+    .sort_by { |name, date| "#{name}#{date.iso8601}" } # Sort by name or date, as you like
+    .each_with_index { |name_and_date, index|
+      begin_new_page(pdf, :right) unless index.zero?
+      one_on_one_page(pdf, *name_and_date)
+    }
+
+  sunday = sunday.next_day(7)
+end
+
+puts "Saving to #{FILE_NAME}"
 pdf.render_file FILE_NAME
 
 

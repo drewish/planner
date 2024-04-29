@@ -3,6 +3,7 @@ require 'prawn/measurement_extensions'
 require 'pry'
 require 'date'
 require 'i18n'
+require 'optparse'
 
 require_relative './config'
 
@@ -15,19 +16,35 @@ def init_pdf
   pdf
 end
 
-# Returns the date and an explanation of it
-def parse_start_of_week
-  unless ARGV.empty?
-    date = DateTime.parse(ARGV.first).to_date
-    return [date.prev_day(date.wday), "Parsed #{date} from arguments"]
-  end
+def parse_options
+  options = { weeks: 1 }
+  OptionParser.new do |parser|
+    parser.banner = "Usage: #{$PROGRAM_NAME} [options] [STARTDATE]"
+    parser.on('-w', '--weeks WEEKS', OptionParser::DecimalInteger, 'Number of weeks to generatate at once')
+    parser.on("-h", "--help", "Prints this help") do
+      puts parser
+      exit
+    end
+  end.parse!(into: options)
 
-  date = DateTime.now.to_date
-  if date.wday > 2
-    [date.next_day(7-date.wday), "No date argument, using next week"]
+  abort("Weeks must be greater than zero") unless options[:weeks] > 0
+
+  # Figure out the start date
+  if ARGV.empty?
+    date = DateTime.now.to_date
+    if date.wday > 2
+      source = "No date argument, using next week"
+      date = date.next_day(7 - date.wday)
+    else
+      source = "No date argument, using this week"
+      date = date.prev_day(date.wday)
+    end
   else
-    [date.prev_day(date.wday), "No date argument, using this week"]
+    date = DateTime.parse(ARGV.first).to_date
+    source = "Parsed #{date} from arguments"
+    date = date.prev_day(date.wday)
   end
+  options.merge(date: date, date_source: source)
 end
 
 def begin_new_page pdf, side

@@ -453,37 +453,43 @@ def weekend_page pdf, saturday, sunday
 end
 
 
-sunday, explanation = parse_start_of_week
-puts explanation
-
-monday = sunday.next_day(1)
-friday = sunday.next_day(5)
-saturday = sunday.next_day(6)
-next_sunday = sunday.next_day(7)
+options = parse_options
+puts options[:date_source]
+sunday = options[:date]
 
 pdf = init_pdf
 
-# Quarterly goals
-if sunday.month != next_sunday.month && (next_sunday.month % 3) == Q1_START_MONTH
-  first = Date.new(next_sunday.year, next_sunday.month, 1)
-  last = first.next_month(3).prev_day
-  puts "Q#{quarter(first)} quarterly goals page for: #{first.strftime(DATE_FULL_START)}#{last.strftime(DATE_FULL_END)}"
-  quarter_ahead(pdf, first, last)
+options[:weeks].times do |week|
+  begin_new_page(pdf, :right) unless week.zero?
+
+  monday = sunday.next_day(1)
+  next_sunday = sunday.next_day(7)
+
+  # Quarterly goals
+  if sunday.month != next_sunday.month && (next_sunday.month % 3) == Q1_START_MONTH
+    first = Date.new(next_sunday.year, next_sunday.month, 1)
+    last = first.next_month(3).prev_day
+    puts "Generating quarterly goals page for Q#{quarter(first)}: #{first.strftime(DATE_FULL_START)}#{last.strftime(DATE_FULL_END)}"
+    quarter_ahead(pdf, first, last)
+  end
+
+  puts "Generating planner pages for #{monday.strftime(DATE_FULL_START)}#{next_sunday.strftime(DATE_FULL_END)}"
+
+  # Weekly goals
+  week_ahead_page pdf, monday, next_sunday
+
+  # Daily pages
+  (1..5).each do |i|
+    day = sunday.next_day(i)
+    daily_tasks_page pdf, day
+    daily_calendar_page pdf, day
+  end
+
+  # Weekend page
+  weekend_page pdf, sunday.next_day(6), next_sunday
+
+  sunday = sunday.next_day(7)
 end
 
-puts "Generating time block planner for #{monday.strftime(DATE_FULL_START)}#{next_sunday.strftime(DATE_FULL_END)} into #{FILE_NAME}"
-
-# Weekly goals
-week_ahead_page pdf, monday, next_sunday
-
-# Daily pages
-(1..5).each do |i|
-  day = sunday.next_day(i)
-  daily_tasks_page pdf, day
-  daily_calendar_page pdf, day
-end
-
-# Weekend page
-weekend_page pdf, saturday, next_sunday
-
+puts "Saving to #{FILE_NAME}"
 pdf.render_file FILE_NAME
