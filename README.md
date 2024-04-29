@@ -58,3 +58,7 @@ Similarly, you can choose a week:
 ## Limitations
 
 Probably only works on a Mac since it hardcodes the font path.
+
+## Thanks
+
+- [@Sumidu](https://github.com/Sumidu) for contributing the internationalization code

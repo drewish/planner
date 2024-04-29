@@ -28,7 +28,7 @@ def one_on_one_page pdf, name, date
     pdf.text name, heading_format(align: :left)
   end
   pdf.grid([1, 0],[1, 1]).bounding_box do
-    pdf.text date.strftime(DATE_LONG), subheading_format(align: :left)
+    pdf.text I18n.l(date, format: :short_date), subheading_format(align: :left)
   end
   # grid([0, 2],[0, 3]).bounding_box do
   #   text "right heading", heading_format(align: :right)
@@ -48,7 +48,7 @@ def one_on_one_page pdf, name, date
     pdf.text name, heading_format(align: :left)
   end
   pdf.grid([1, 0],[1, 1]).bounding_box do
-    pdf.text date.strftime(DATE_LONG), subheading_format(align: :left)
+    subheading_format(align: :left)
   end
 
   question_start = 25
@@ -83,6 +83,7 @@ end
 
 
 options = parse_options
+init_i18n(options[:locale])
 puts options[:date_source]
 sunday = options[:date]
 
@@ -93,7 +94,7 @@ options[:weeks].times do |week|
 
   monday = sunday.next_day(1)
   next_sunday = sunday.next_day(7)
-  puts "Generating one-on-one forms for #{monday.strftime(DATE_FULL_START)}#{next_sunday.strftime(DATE_FULL_END)}"
+  puts "Generating one-on-one forms for #{date_range(monday, next_sunday)}"
 
   hole_punches pdf
 

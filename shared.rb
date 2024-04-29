@@ -4,7 +4,6 @@ require 'pry'
 require 'date'
 require 'i18n'
 require 'optparse'
-
 require_relative './config'
 
 def init_pdf
@@ -16,10 +15,16 @@ def init_pdf
   pdf
 end
 
+def init_i18n(locale)
+  I18n.load_path += Dir[File.expand_path("config/locales") + "/*.yml"]
+  I18n.default_locale = locale if locale
+end
+
 def parse_options
-  options = { weeks: 1 }
+  options = { weeks: 1, locale: 'en' }
   OptionParser.new do |parser|
     parser.banner = "Usage: #{$PROGRAM_NAME} [options] [STARTDATE]"
+    parser.on('-l', '--locale LOCALE', 'Locale to use for internationalization')
     parser.on('-w', '--weeks WEEKS', OptionParser::DecimalInteger, 'Number of weeks to generatate at once')
     parser.on("-h", "--help", "Prints this help") do
       puts parser
@@ -143,4 +148,19 @@ def notes_page pdf, heading_left, subheading_left = nil, heading_right = nil, su
       draw_checkbox pdf
     end
   end
+end
+
+def date_range(start, finish)
+  start_format =
+    if start.year != finish.year
+      # different years, print full dates
+      :range_diff_long
+    elsif start.month != finish.month
+      # same year, diff month
+      :range_same_year_long
+    else
+      # same year and month
+      :range_same_month_long
+    end
+  "#{I18n.l(start, format: start_format)}#{I18n.l(finish, format: :long)}"
 end

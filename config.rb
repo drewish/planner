@@ -5,11 +5,6 @@ COLUMN_COUNT = 4
 LIGHT_COLOR = 'AAAAAA'
 MEDIUM_COLOR = '888888'
 DARK_COLOR   = '000000'
-DATE_FULL_START = '%A, %B %-d'
-DATE_FULL_END = ' — %A, %B %-d, %Y'
-DATE_FULL = '%A, %B %-d, %Y'
-DATE_LONG = '%B %-d, %Y'
-DATE_DAY = '%A'
 OSX_FONT_PATH = "/System/Library/Fonts/Supplemental/Futura.ttc"
 FONTS = {
   'Futura' => {
@@ -19,18 +14,13 @@ FONTS = {
     condensed: { file: OSX_FONT_PATH, font: 'Futura Condensed Medium' },
   }
 }
-PAGE_SIZE = 'A4' # Could also do 'A4'
+PAGE_SIZE = 'LETTER' # Could also do 'A4'
 # Order is top, right, bottom, left
 LEFT_PAGE_MARGINS = [36, 72, 36, 36]
 RIGHT_PAGE_MARGINS = [36, 36, 36, 72]
 
-# Load internationalization strings
-I18n.load_path += Dir[File.join(__dir__, 'config', 'locales', '*.{rb,yml}')]
-I18n.available_locales = [:de, :en]
-I18n.default_locale = :de
-
 # Adjust the quarters to a fiscal year, 1 for Jan, 2 for Feb, etc.
-Q1_START_MONTH = 1
+Q1_START_MONTH = 2
 QUARTERS_BY_MONTH = (1..12).map { |month| (month / 3.0).ceil }.rotate(1 - Q1_START_MONTH).unshift(nil)
 
 # Adjust the start of semesters
