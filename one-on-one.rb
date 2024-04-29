@@ -28,7 +28,7 @@ def one_on_one_page pdf, name, date
     pdf.text name, heading_format(align: :left)
   end
   pdf.grid([1, 0],[1, 1]).bounding_box do
-    pdf.text I18n.l(date, format: :short_date), subheading_format(align: :left)
+    pdf.text I18n.l(date, format: :medium), subheading_format(align: :left)
   end
   # grid([0, 2],[0, 3]).bounding_box do
   #   text "right heading", heading_format(align: :right)

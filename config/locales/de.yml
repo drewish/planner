@@ -7,15 +7,13 @@ de:
     formats:
       default: "%d.%m.%Y"
       short: "%d. %b"
+      medium: "%-d. %B"
       long: "%d. %B %Y"
       weekday: "%A"
       year: "%Y"
-      short_date: " %-d. %B"
       range_diff_long: "%A, %-d. %B, %Y – "
       range_same_year_long: "%A, %-d. %B – "
       range_same_month_long: "%A, %-d. – "
-      left_range: "%A, %-d. %B "
-      right_range: "%A, %-d. %B, %Y"
   business_days_in_year:
     zero: "letzter Arbeitstag im Jahr"
     one: "ein weiterer Arbeitstag im Jahr"

@@ -87,7 +87,7 @@ end
 
 def quarter_ahead pdf, first_day, last_day
   heading_left = I18n.t('quarter_plan')
-  subheading_left = "#{I18n.l(first_day, format: :left_range)} — #{I18n.l(last_day, format: :right_range)}"
+  subheading_left = date_range(first_day, last_day)
   heading_right = I18n.t('quarter', number: quarter(first_day))
   subheading_right = I18n.l(last_day, format: :year)
 
@@ -172,7 +172,7 @@ def daily_tasks_page pdf, date, metrics_rows = 5
   # pdf.grid.show_all
 
   # Header
-  left_header = I18n.l(date, format: :long)
+  left_header = I18n.l(date, format: :medium)
   right_header = I18n.l(date, format: :weekday)
   pdf.grid([0, 0],[1, 2]).bounding_box do
     pdf.text left_header, heading_format(align: :left)
@@ -248,7 +248,7 @@ def daily_calendar_page pdf, date
   pdf.define_grid(columns: COLUMN_COUNT, rows: header_row_count + body_row_count, gutter: 0)
 
   # Header
-  left_header = I18n.l(date, format: :long)
+  left_header = I18n.l(date, format: :medium)
   right_header = I18n.l(date, format: :weekday)
   left_subhed = date.strftime("#{I18n.t('quarter', number: quarter(date))} #{I18n.t('week')} %W #{I18n.t('day')} %j")
   # right_subhed = business_days_left_in_year(date)
@@ -342,7 +342,7 @@ def weekend_page pdf, saturday, sunday
 
       # Header
       left_header = I18n.l(date, format: :weekday)
-      left_sub_header = I18n.l(date, format: :short_date)
+      left_sub_header = I18n.l(date, format: :medium)
       pdf.grid([0, 0],[0, 1]).bounding_box do
         pdf.text left_header, heading_format(align: :left)
       end
@@ -440,7 +440,7 @@ options[:weeks].times do |week|
   if sunday.month != next_sunday.month && (next_sunday.month % 3) == Q1_START_MONTH
     first = Date.new(next_sunday.year, next_sunday.month, 1)
     last = first.next_month(3).prev_day
-    puts "Generating quarterly goals page for Q#{date_range(first)}: #{date_range(first, last)}"
+    puts "Generating quarterly goals page for Q#{quarter(first)}: #{date_range(first, last)}"
     quarter_ahead(pdf, first, last)
   end
 
