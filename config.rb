@@ -48,11 +48,36 @@ OOOS_BY_WDAY = [nil, nil, ['Hendrik', 'Marvin', 'Maged', 'Marthe' ], ['Toni'], [
 # Repeating tasks by day of week, 0 is Sunday. Nested index is the row.
 TASKS_BY_WDAY = [
   { 0 => 'Wochenplan' }, # Sonntag
-  { 0 => 'Unterschriftenmappe', 1 => 'Fragen für die Profrunde', 2 => 'ForschMedi updaten'}, # Montag
-  { 0 => 'Unterschriftenmappe', 1 => 'Standup-Notizen (Hendrik, Marthe, Marvin, Maged)', 2 => 'SMNF Folien'}, # Dienstag
-  { 0 => 'Unterschriftenmappe', 1 => 'OSE check', 2 => 'Standup-Notizen (Toni)', 3 =>  'Jour-Fixe Agenda'}, # Mittwoch
-  { 0 => 'Unterschriftenmappe', 1 => 'Standup-Notizen (Leonard, Lilian)', 2 => 'SMNF updaten'}, # Donnerstag
-  { 0 => 'Unterschriftenmappe', 16 => 'Week-Shutdown'},
+  { 0 => 'Unterschriftenmappe', # Montag
+      1 => 'Email-Triage',
+      2 => 'Fragen für die Profrunde',
+      3 => 'ForschMedi updaten'
+      15 => 'Emails'
+    },
+  { 0 => 'Unterschriftenmappe', # Dienstag
+      1 => 'Email-Triage',
+      2 => 'Standup-Notizen (Hendrik, Marthe, Marvin, Maged)',
+      3 => 'SMNF Folien',
+      15 => 'Emails'
+    },
+  { 0 => 'Unterschriftenmappe', # Mittwoch
+      1 => 'Email-Triage',
+      2 => 'OSE check',
+      3 => 'Standup-Notizen (Toni)',
+      4 =>  'Jour-Fixe Agenda',
+      15 => 'Emails'
+    },
+  { 0 => 'Unterschriftenmappe', # Donnerstag
+      1 => 'Email-Triage',
+      2 => 'Standup-Notizen (Leonard, Lilian)',
+      3 => 'SMNF updaten',
+      15 => 'Emails'
+    },
+  { 0 => 'Unterschriftenmappe', # Freitag
+      1 => 'Email-Triage',
+      15 => 'Emails',
+      16 => 'Week-Shutdown',
+      17 => 'Nächste Woche drucken'},
   { 0 => 'Sport' },
 ]
 
