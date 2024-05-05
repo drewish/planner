@@ -86,7 +86,7 @@ end
 # * * *
 
 def quarter_ahead pdf, first_day, last_day
-  heading_left = I18n.t('quarter_plan')
+  heading_left = I18n.t('quarter_plan_heading')
   subheading_left = date_range(first_day, last_day)
   heading_right = I18n.t('quarter', number: quarter(first_day))
   subheading_right = I18n.l(last_day, format: :year)
@@ -100,7 +100,7 @@ def quarter_ahead pdf, first_day, last_day
 end
 
 def week_ahead_page pdf, first_day, last_day
-  heading_left = I18n.t('upcoming_week')
+  heading_left = I18n.t('week_plan_heading')
   subheading_left = date_range(first_day, last_day)
   heading_right = first_day.strftime("#{I18n.t('week')} %W")
   subheading_right = I18n.t('quarter', number: quarter(first_day))
