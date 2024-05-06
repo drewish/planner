@@ -51,7 +51,7 @@ TASKS_BY_WDAY = [
   { 0 => 'Unterschriftenmappe', # Montag
       1 => 'Email-Triage',
       2 => 'Fragen für die Profrunde',
-      3 => 'ForschMedi updaten'
+      3 => 'ForschMedi updaten',
       15 => 'Emails'
     },
   { 0 => 'Unterschriftenmappe', # Dienstag
