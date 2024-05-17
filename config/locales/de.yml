@@ -1,9 +1,26 @@
 de:
   date:
-    day_names: [Sonntag, Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag]
+    day_names:
+      [Sonntag, Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag]
     abbr_day_names: [So, Mo, Di, Mi, Do, Fr, Sa]
-    month_names: [~, Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober, November, Dezember]
-    abbr_month_names: [~, Jan, Feb, Mär, Apr, Mai, Jun, Jul, Aug, Sep, Okt, Nov, Dez]
+    month_names:
+      [
+        ~,
+        Januar,
+        Februar,
+        März,
+        April,
+        Mai,
+        Juni,
+        Juli,
+        August,
+        September,
+        Oktober,
+        November,
+        Dezember,
+      ]
+    abbr_month_names:
+      [~, Jan, Feb, Mär, Apr, Mai, Jun, Jul, Aug, Sep, Okt, Nov, Dez]
     formats:
       default: "%d.%m.%Y"
       short: "%d. %b"
@@ -49,17 +66,17 @@ de:
   feedback: "Feedback"
   questions_to_ask: "Leitfragen"
   questions_left: |
-    • Tell me about what you’ve been working on.
-    • Tell me about your week – what’s it been like?
-    • Tell me about your family/weekend/activities?
-    • Where are you on ( ) project?
-    • Are you on track to meet the deadline?
-    • What questions do you have about the project?
-    • What did ( ) say about this?
+    • An was hast Du diese Woche gearbeitet?
+    • Wie ist es Dir seit letzter Woche ergangen??
+    • Hast Du Dich am Wochende erholen können? ?
+    • Wie läuft es mit Projekt ( )?
+    • Ist die Deadline noch zu erreichen?
+    • Benötigst Du irgendwelchen Input von mir dazu?
+    • Was hat ( ) dazu gesagt ?
   questions_right: |
-    • Is there anything I need to do, and if so by when?
-    • How are you going to approach this?
-    • What do you think you should do?
-    • So, you’re going to do “( )” by “( )”, right?
-    • What can you/we do differently next time?
-    • Any ideas/suggestions/improvements?
+    • Gibt es etwas was ich tun muss und bis wann?
+    • Hast Du Dir überlegt, wie Du das angehen möchtest?
+    • Was glaubst Du solltest Du tun?
+    • Also wirst Du “( )” bis “( )” gemacht haben, richtig?
+    • Was kannst Du/Wir nächstes Mal anders machen?
+    • Hast Du Ideen/Anregungen/Verbesserungsvorschläge dazu?
