@@ -30,29 +30,40 @@ bundle install
 
 ## Usage
 
+### Planner Pages
+
 You can generate planner pages for the current week:
-```
+```sh
 ./planner.rb
 ```
 
 Or, you can generate a different week's pages by passing in the date:
-```
+```sh
 ./planner.rb 2022-05-27
 ```
 
-On a Mac you can send the PDF directly to your printer:
+If you'd like to generate multiple weeks at once:
+```sh
+./planner.rb --weeks 4
 ```
+
+On a Mac you can send the PDF directly to your printer:
+```sh
 lpr time_block_pages.pdf
 ```
 
-The script that generates the 1-on-1 forms works similarly:
-```
-./one-on-one.rb
+### One-on-one Pages
+
+The script that generates the 1-on-1 forms supports the same options:
+```sh
+./one-on-one.rb -weeks 2 2022-05-27
 ```
 
-Similarly, you can choose a week:
-```
-./one-on-one.rb 2022-05-27
+### Notes Pages
+
+You can also generate a PDF of some simple lined pages:
+```sh
+./notes.rb
 ```
 
 ## Limitations
