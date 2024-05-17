@@ -43,7 +43,7 @@ SPRINT_EPOCH = Date.parse('2023-01-04')
 SPRINT_LENGTH = 14
 
 # Names by day of week, 0 is Sunday.
-OOOS_BY_WDAY = [nil, nil, ['Hendrik', 'Marvin', 'Maged', 'Marthe' ], ['Toni'], ['Leonard','Lilian'], nil, nil]
+OOOS_BY_WDAY = [nil, nil, ['Lilian', 'Hendrik', 'Marvin', 'Maged', 'Marthe' ], ['Toni'], ['Leonard'], nil, nil]
 
 # Repeating tasks by day of week, 0 is Sunday. Nested index is the row.
 TASKS_BY_WDAY = [
