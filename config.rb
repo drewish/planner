@@ -32,60 +32,34 @@ USE_SPRINTS = false
 SPRINT_EPOCH = Date.parse('2023-01-04')
 SPRINT_LENGTH = 14
 
+# This is the defaul plan for a week
+# Change it here or use a separate file to load it, if your week plan changes regularly
+
 # Names by day of week, 0 is Sunday.
-OOOS_BY_WDAY = [nil, nil, ['Lilian', 'Hendrik', 'Marvin', 'Maged', 'Marthe' ], ['Toni'], ['Leonard'], nil, nil]
+OOOS_BY_WDAY = [nil, nil, ['Juan'], ['Kelly'], nil, ['Alex', 'Edna'], nil]
+
 
 # Repeating tasks by day of week, 0 is Sunday. Nested index is the row.
 TASKS_BY_WDAY = [
-  { 0 => 'Wochenplan' }, # Sonntag
-  { 0 => 'Unterschriftenmappe', # Montag
-      1 => 'Trello',
-      2 => 'Email-Triage',
-      3 => 'Fragen für die Profrunde',
-      4 => 'ForschMedi updaten',
-      15 => 'Emails'
-    },
-  { 0 => 'Unterschriftenmappe', # Dienstag
-      1 => 'Trello',
-      2 => 'Email-Triage',
-      3 => 'Standup-Notizen (Hendrik, Marthe, Marvin, Maged)',
-      4 => 'SMNF Folien',
-      15 => 'Emails'
-    },
-  { 0 => 'Unterschriftenmappe', # Mittwoch
-      1 => 'Trello',
-      2 => 'Email-Triage',
-      3 => 'OSE check',
-      4 => 'Standup-Notizen (Toni)',
-      5 =>  'Jour-Fixe Agenda',
-      15 => 'Emails'
-    },
-  { 0 => 'Unterschriftenmappe', # Donnerstag
-      1 => 'Trello',
-      2 => 'Email-Triage',
-      3 => 'Standup-Notizen (Leonard, Lilian)',
-      4 => 'SMNF updaten',
-      15 => 'Emails'
-    },
-  { 0 => 'Unterschriftenmappe', # Freitag
-      1 => 'Trello',
-      2 => 'Email-Triage',
-      14 => 'Unterschriften Mappe wegsortieren',
-      15 => 'Emails',
-      16 => 'Week-Shutdown',
-      17 => 'Nächste Woche drucken'},
-  { 0 => 'Sport' },
+  { 0 => 'Plan meals' },
+  { 0 => 'Update standup notes' },
+  { 0 => 'Update standup notes' },
+  { 0 => 'Update standup notes' },
+  { 0 => 'Update standup notes' },
+  { 0 => 'Update standup notes' },
+  { 0 => 'Plan next week' },
 ]
 
 # Repeating Appointments by day of week, 0 is Sunday. Nested index is a value in HOUR_LABELS.
-#APPOINTMENTS_BY_WDAY = [
-#  {},
-#  {},
-#  {},
-#  {},
-#  {},
-#  {},
-#  {},
-#]
+APPOINTMENTS_BY_WDAY = [
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
+]
 
-require_relative './summer'
+# Here you could load your week plan from another file
+#require_relative './my_summer_plan'
