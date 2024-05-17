@@ -104,7 +104,7 @@ options[:weeks].times do |week|
 hole_punches pdf
 
 # we add a notes page at the beginning to start on a left page
-heading_left = "Notes"
+heading_left = I18n.t('notes_heading')
 notes_page pdf, heading_left
 begin_new_page pdf, :left
 
@@ -120,6 +120,11 @@ OOOS_BY_WDAY
 
   sunday = sunday.next_day(7)
 end
+# we add a notes page at the end to end on a left page
+begin_new_page pdf, :left
+heading_left = I18n.t('notes_heading')
+notes_page pdf, heading_left
+
 
 puts "Saving to #{FILE_NAME}"
 pdf.render_file FILE_NAME

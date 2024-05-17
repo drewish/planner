@@ -62,4 +62,4 @@ APPOINTMENTS_BY_WDAY = [
 ]
 
 # Here you could load your week plan from another file
-#require_relative './my_summer_plan'
+require_relative './my_summer_plan'
