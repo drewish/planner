@@ -2,7 +2,22 @@ en:
   date:
     day_names: [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
     abbr_day_names: [Su, Mo, Tu, We, Th, Fr, Sa]
-    month_names: [~, January, February, March, April, May, June, July, August, September, October, November, December]
+    month_names:
+      [
+        ~,
+        January,
+        February,
+        March,
+        April,
+        May,
+        June,
+        July,
+        August,
+        September,
+        October,
+        November,
+        December,
+      ]
     abbr_month_names: [~, Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
     formats:
       default: "%m/%d/%Y"
@@ -40,3 +55,29 @@ en:
   content_outline: "Outline of content"
   semester_overview: "Semester overview"
   weekly_overview: "Weekly overviews"
+  personal_notes: "Personal/Notes:"
+  personal_notes_example: "(Spouse, children, pets, hobbies, friends, history, etc.)"
+  their_update: "Their update:"
+  their_update_instructions: "(Notes you take from their “10 minutes”)"
+  my_update: "My update:"
+  my_update_instructions: "(Notes you make to prepare for your “10 minutes”)"
+  future: "Future/Follow Up:"
+  future_instructions: "(Where are they headed? Items to review at the next 1:1)"
+  additional_notes: "Additional Notes:"
+  feedback: "Feedback:"
+  questions_to_ask: "Questions to ask:"
+  questions_left: |
+    • Tell me about what you’ve been working on.
+    • Tell me about your week – what’s it been like?
+    • Tell me about your family/weekend/activities?
+    • Where are you on ( ) project?
+    • Are you on track to meet the deadline?
+    • What questions do you have about the project?
+    • What did ( ) say about this?
+  questions_right: |
+    • Is there anything I need to do, and if so by when?
+    • How are you going to approach this?
+    • What do you think you should do?
+    • So, you’re going to do “( )” by “( )”, right?
+    • What can you/we do differently next time?
+    • Any ideas/suggestions/improvements?

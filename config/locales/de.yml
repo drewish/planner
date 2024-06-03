@@ -2,7 +2,22 @@ de:
   date:
     day_names: [Sonntag, Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag]
     abbr_day_names: [So, Mo, Di, Mi, Do, Fr, Sa]
-    month_names: [~, Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober, November, Dezember]
+    month_names:
+      [
+        ~,
+        Januar,
+        Februar,
+        März,
+        April,
+        Mai,
+        Juni,
+        Juli,
+        August,
+        September,
+        Oktober,
+        November,
+        Dezember,
+      ]
     abbr_month_names: [~, Jan, Feb, Mär, Apr, Mai, Jun, Jul, Aug, Sep, Okt, Nov, Dez]
     formats:
       default: "%d.%m.%Y"
@@ -40,3 +55,29 @@ de:
   content_outline: "Inhaltsübersicht"
   semester_overview: "Semesterübersicht"
   weekly_overview: "Wochenübersicht"
+  personal_notes: "Persönliches/Notizen:"
+  personal_notes_example: "(Partner, Kinder, Haustiere, Hobbies, Freunde, Vorgeschichte, etc.)"
+  their_update: "Ihr Update:"
+  their_update_instructions: "(Notizen aus ihren “10 Minuten”)"
+  my_update: "Mein Update:"
+  my_update_instructions: "(Notizen als Vorbereitung für meine “10 Minuten”)"
+  future: "Zukunft/Follow Up:"
+  future_instructions: "(Was kommt als nächstes? Dinge für das nächste 1:1)"
+  additional_notes: "Zusätzliche Notizen:"
+  feedback: "Feedback:"
+  questions_to_ask: "Leitfragen:"
+  questions_left: |
+    • An was hast Du diese Woche gearbeitet?
+    • Wie ist es Dir seit letzter Woche ergangen??
+    • Hast Du Dich am Wochende erholen können? ?
+    • Wie läuft es mit Projekt ( )?
+    • Ist die Deadline noch zu erreichen?
+    • Benötigst Du irgendwelchen Input von mir dazu?
+    • Was hat ( ) dazu gesagt ?
+  questions_right: |
+    • Gibt es etwas was ich tun muss und bis wann?
+    • Hast Du Dir überlegt, wie Du das angehen möchtest?
+    • Was glaubst Du solltest Du tun?
+    • Also wirst Du “( )” bis “( )” gemacht haben, richtig?
+    • Was kannst Du/Wir nächstes Mal anders machen?
+    • Hast Du Ideen/Anregungen/Verbesserungsvorschläge dazu?
