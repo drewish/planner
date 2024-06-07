@@ -28,11 +28,16 @@ SUMMER_SEMESTER_START = 4 # April
 WINTER_SEMESTER_START = 10 # October
 
 # Use these if you have sprints of a weekly interval
+USE_SPRINTS = false
 SPRINT_EPOCH = Date.parse('2023-01-04')
 SPRINT_LENGTH = 14
 
+# This is the defaul plan for a week
+# Change it here or use a separate file to load it, if your week plan changes regularly
+
 # Names by day of week, 0 is Sunday.
 OOOS_BY_WDAY = [nil, nil, ['Juan'], ['Kelly'], nil, ['Alex', 'Edna'], nil]
+
 
 # Repeating tasks by day of week, 0 is Sunday. Nested index is the row.
 TASKS_BY_WDAY = [
@@ -55,3 +60,6 @@ APPOINTMENTS_BY_WDAY = [
   {},
   {},
 ]
+
+# Here you could load your week plan from another file
+#require_relative './my_summer_plan'

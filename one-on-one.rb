@@ -42,7 +42,7 @@ def one_on_one_page pdf, name, date
   })
 
   # Back of the page
-  begin_new_page pdf, :left
+  begin_new_page pdf, :right
 
   pdf.grid([0, 0],[1, 1]).bounding_box do
     pdf.text name, heading_format(align: :left)
@@ -85,22 +85,31 @@ options[:weeks].times do |week|
   next_sunday = sunday.next_day(7)
   puts "Generating one-on-one forms for #{date_range(monday, next_sunday)}"
 
-  hole_punches pdf
+#pdf = init_pdf
+hole_punches pdf
 
-  OOOS_BY_WDAY
-    .each_with_index
-    .reject { |names, _| names.nil? }
-    .flat_map { |names, wday| names.map {|name| [name, sunday.next_day(wday)] } }
-    .sort_by { |name, date| "#{name}#{date.iso8601}" } # Sort by name or date, as you like
-    .each_with_index { |name_and_date, index|
-      begin_new_page(pdf, :right) unless index.zero?
-      one_on_one_page(pdf, *name_and_date)
-    }
+# we add a notes page at the beginning to start on a left page
+heading_left = I18n.t('notes_heading')
+notes_page pdf, heading_left
+begin_new_page pdf, :left
+
+OOOS_BY_WDAY
+  .each_with_index
+  .reject { |names, _| names.nil? }
+  .flat_map { |names, wday| names.map {|name| [name, sunday.next_day(wday)] } }
+  .sort_by { |name, date| "#{name}#{date.iso8601}" } # Sort by name or date, as you like
+  .each_with_index { |name_and_date, index|
+    begin_new_page(pdf, :left) unless index.zero?
+    one_on_one_page(pdf, *name_and_date)
+  }
 
   sunday = sunday.next_day(7)
 end
+# we add a notes page at the end to end on a left page
+begin_new_page pdf, :left
+heading_left = I18n.t('notes_heading')
+notes_page pdf, heading_left
+
 
 puts "Saving to #{FILE_NAME}"
 pdf.render_file FILE_NAME
-
-
