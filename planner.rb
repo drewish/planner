@@ -251,8 +251,11 @@ def daily_calendar_page pdf, date
   left_header = I18n.l(date, format: :medium)
   right_header = I18n.l(date, format: :weekday)
   left_subhed = date.strftime("#{I18n.t('quarter', number: quarter(date))} #{I18n.t('week')} %W #{I18n.t('day')} %j")
-  # right_subhed = business_days_left_in_year(date)
-  right_subhed = business_days_left_in_sprint(date)
+  if (USE_SPRINTS)
+    right_subhed = business_days_left_in_sprint(date)
+  else
+    right_subhed = business_days_left_in_year(date)
+  end
   pdf.grid([0, first_column],[1, 1]).bounding_box do
     pdf.text left_header, heading_format(align: :left)
   end
@@ -283,6 +286,10 @@ def daily_calendar_page pdf, date
         end
       end
     end
+
+
+
+
   end
 
   # Horizontal lines

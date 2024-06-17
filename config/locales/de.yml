@@ -1,6 +1,7 @@
 de:
   date:
-    day_names: [Sonntag, Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag]
+    day_names:
+      [Sonntag, Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag]
     abbr_day_names: [So, Mo, Di, Mi, Do, Fr, Sa]
     month_names:
       [
@@ -55,6 +56,7 @@ de:
   content_outline: "Inhaltsübersicht"
   semester_overview: "Semesterübersicht"
   weekly_overview: "Wochenübersicht"
+
   personal_notes: "Persönliches/Notizen:"
   personal_notes_example: "(Partner, Kinder, Haustiere, Hobbies, Freunde, Vorgeschichte, etc.)"
   their_update: "Ihr Update:"
