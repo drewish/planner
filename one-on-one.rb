@@ -42,7 +42,12 @@ def one_on_one_page pdf, name, date
   })
 
   # Back of the page
-  begin_new_page pdf, :right
+  if (OOOS_SIDE_BY_SIDE)
+    begin_new_page pdf, :right
+  else
+    begin_new_page pdf, :left
+  end
+
 
   pdf.grid([0, 0],[1, 1]).bounding_box do
     pdf.text name, heading_format(align: :left)
@@ -79,7 +84,11 @@ sunday = options[:date]
 pdf = init_pdf
 
 options[:weeks].times do |week|
-  begin_new_page(pdf, :right) unless week.zero?
+  if (OOOS_SIDE_BY_SIDE)
+    begin_new_page(pdf, :left) unless week.zero?
+  else
+    begin_new_page(pdf, :right) unless week.zero?
+  end
 
   monday = sunday.next_day(1)
   next_sunday = sunday.next_day(7)
@@ -88,10 +97,14 @@ options[:weeks].times do |week|
 #pdf = init_pdf
 hole_punches pdf
 
-# we add a notes page at the beginning to start on a left page
-heading_left = I18n.t('notes_heading')
-notes_page pdf, heading_left
-begin_new_page pdf, :left
+# If you want to have your one on one pages laid out side by side,
+# you need to add a blank or notes page in the beginning
+## we add a notes page at the beginning to start on a left page
+if OOOS_SIDE_BY_SIDE
+  heading_left = I18n.t('notes_heading')
+  notes_page pdf, heading_left
+  begin_new_page pdf, :left
+end
 
 OOOS_BY_WDAY
   .each_with_index
@@ -99,16 +112,25 @@ OOOS_BY_WDAY
   .flat_map { |names, wday| names.map {|name| [name, sunday.next_day(wday)] } }
   .sort_by { |name, date| "#{name}#{date.iso8601}" } # Sort by name or date, as you like
   .each_with_index { |name_and_date, index|
-    begin_new_page(pdf, :left) unless index.zero?
+    if OOOS_SIDE_BY_SIDE
+      begin_new_page(pdf, :left) unless index.zero?
+    else
+      begin_new_page(pdf, :right) unless index.zero?
+    end
     one_on_one_page(pdf, *name_and_date)
   }
 
   sunday = sunday.next_day(7)
 end
-# we add a notes page at the end to end on a left page
-begin_new_page pdf, :left
-heading_left = I18n.t('notes_heading')
-notes_page pdf, heading_left
+
+
+
+# we add a notes page at the end to end on a left page, if in side by side mode
+if OOOS_SIDE_BY_SIDE
+  begin_new_page pdf, :left
+  heading_left = I18n.t('notes_heading')
+  notes_page pdf, heading_left
+end
 
 
 puts "Saving to #{FILE_NAME}"
