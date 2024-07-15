@@ -36,17 +36,18 @@ def parse_options
 
   # Figure out the start date
   if ARGV.empty?
+    source = "No date argument provided, "
     date = DateTime.now.to_date
     if date.wday > 2
-      source = "No date argument, using next week"
+      source += "defaulting to next week."
       date = date.next_day(7 - date.wday)
     else
-      source = "No date argument, using this week"
+      source += "defaulting to current week."
       date = date.prev_day(date.wday)
     end
   else
     date = DateTime.parse(ARGV.first).to_date
-    source = "Parsed #{date} from arguments"
+    source = "Parsed #{date} from date argument."
     date = date.prev_day(date.wday)
   end
   options.merge(date: date, date_source: source)

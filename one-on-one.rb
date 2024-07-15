@@ -73,7 +73,7 @@ end
 
 options = parse_options
 init_i18n(options[:locale])
-puts options[:date_source]
+puts "#{options[:date_source]} Will save to #{FILE_NAME}"
 sunday = options[:date]
 
 pdf = init_pdf
@@ -100,7 +100,4 @@ options[:weeks].times do |week|
   sunday = sunday.next_day(7)
 end
 
-puts "Saving to #{FILE_NAME}"
 pdf.render_file FILE_NAME
-
-

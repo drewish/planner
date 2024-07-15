@@ -425,7 +425,7 @@ end
 
 options = parse_options
 init_i18n(options[:locale])
-puts options[:date_source]
+puts "#{options[:date_source]} Will save to #{FILE_NAME}"
 sunday = options[:date]
 
 pdf = init_pdf
@@ -440,7 +440,7 @@ options[:weeks].times do |week|
   if sunday.month != next_sunday.month && (next_sunday.month % 3) == Q1_START_MONTH
     first = Date.new(next_sunday.year, next_sunday.month, 1)
     last = first.next_month(3).prev_day
-    puts "Generating quarterly goals page for Q#{quarter(first)}: #{date_range(first, last)}"
+    puts "Generating quarterly goals page for Q#{quarter(first)} #{date_range(first, last)}"
     quarter_ahead(pdf, first, last)
   end
 
@@ -462,5 +462,4 @@ options[:weeks].times do |week|
   sunday = sunday.next_day(7)
 end
 
-puts "Saving to #{FILE_NAME}"
 pdf.render_file FILE_NAME
