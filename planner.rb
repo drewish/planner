@@ -370,7 +370,7 @@ def weekend_page pdf, saturday, sunday
       # Checkboxes
       checkbox_padding = 6
       ((task_start_row + 1)..task_last_row).each_with_index do |row, index|
-        pdf.grid(row, 0).bounding_box do
+        pdf.grid([row, 0], [row, 1]).bounding_box do
           draw_checkbox pdf, checkbox_padding, TASKS_BY_WDAY[date.wday][index]
         end
       end
