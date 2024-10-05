@@ -39,7 +39,7 @@ You can generate planner pages for the current week:
 
 Or, you can generate a different week's pages by passing in the date:
 ```sh
-./planner.rb 2022-05-27
+./planner.rb 2023-05-01
 ```
 
 If you'd like to generate multiple weeks at once:
@@ -56,7 +56,7 @@ lpr time_block_pages.pdf
 
 The script that generates the 1-on-1 forms supports the same options:
 ```sh
-./one-on-one.rb -weeks 2 2022-05-27
+./one-on-one.rb -weeks 2 2023-05-01
 ```
 
 ### Notes Pages
