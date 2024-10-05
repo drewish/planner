@@ -152,16 +152,16 @@ def notes_page pdf, heading_left, subheading_left = nil, heading_right = nil, su
 end
 
 def date_range(start, finish)
-  start_format =
+  formats =
     if start.year != finish.year
       # different years, print full dates
-      :range_diff_long
+      [:range_start, :range_end]
     elsif start.month != finish.month
       # same year, diff month
-      :range_same_year_long
+      [:range_start_same_year, :range_end_same_year]
     else
       # same year and month
-      :range_same_month_long
+      [:range_start_same_month, :range_end_same_month]
     end
-  "#{I18n.l(start, format: start_format)}#{I18n.l(finish, format: :long)}"
+  [I18n.l(start, format: formats.first), I18n.l(finish, format: formats.last)].join
 end
