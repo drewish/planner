@@ -31,8 +31,27 @@ WINTER_SEMESTER_START = 10 # October
 SPRINT_EPOCH = Date.parse('2023-01-04')
 SPRINT_LENGTH = 14
 
-# Names by day of week, 0 is Sunday.
-OOOS_BY_WDAY = [nil, nil, ['Juan'], ['Kelly'], nil, ['Alex', 'Edna'], nil]
+def one_on_ones_for sunday
+  # Weekly
+  sun = []
+  mon = []
+  tue = %w(Randy)
+  wed = %w(Jose Jason)
+  thr = %w(Amulya)
+  fri = []
+  sat = []
+
+  # Biweekly
+  cweek = sunday.cweek
+  wed << 'Jose Luis' if cweek % 2 == 0
+  wed << 'Mamatha'   if cweek % 2 == 1
+
+  # Monthly
+  tue << 'Tyler'     if cweek % 4 == 1
+  wed << 'Guerrero'  if cweek % 4 == 3
+
+  [sun, mon, tue, wed, thr, fri, sat]
+end
 
 # Repeating tasks by day of week, 0 is Sunday. Nested index is the row.
 TASKS_BY_WDAY = [

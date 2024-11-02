@@ -85,12 +85,20 @@ options[:weeks].times do |week|
   next_sunday = sunday.next_day(7)
   puts "Generating one-on-one forms for #{date_range(monday, next_sunday)}"
 
-  hole_punches pdf
-
-  OOOS_BY_WDAY
+  names_and_dates = one_on_ones_for(sunday)
     .each_with_index
     .reject { |names, _| names.nil? }
     .flat_map { |names, wday| names.map {|name| [name, sunday.next_day(wday)] } }
+
+  # Show who we're meeting each day
+  names_and_dates
+    .group_by { |name, date| date }
+    .transform_values{ |day| day.map{ |name, _| name }.sort }
+    .map { |date, names| puts "#{I18n.l(date, format: :long)}\n- #{names.join("\n- ")}" }
+
+  hole_punches pdf
+
+  names_and_dates
     .sort_by { |name, date| "#{name}#{date.iso8601}" } # Sort by name or date, as you like
     .each_with_index { |name_and_date, index|
       begin_new_page(pdf, :right) unless index.zero?

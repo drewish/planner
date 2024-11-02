@@ -1,5 +1,8 @@
 # Change Log
 
+## 2024-11
+- Allow periodic scheduling of 1:1s.
+
 ## 2024-10
 - Improved the date range format.
 
@@ -18,7 +21,7 @@
 - Size of metrics block is now configurable.
 
 ## 2023-12
-- Addied script to generate notes pages.
+- Added script to generate notes pages.
 
 ## 2023-09
 - Fix wrapping with longer strings.
