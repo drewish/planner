@@ -8,8 +8,13 @@ require_relative './config'
 
 def init_pdf
   pdf = Prawn::Document.new(margin: RIGHT_PAGE_MARGINS, print_scaling: :none)
-  pdf.font_families.update(FONTS)
-  pdf.font(FONTS.keys.first)
+  # Use Helvetica for Linux environments where Futura isn't available
+  begin
+    pdf.font_families.update(FONTS)
+    pdf.font(FONTS.keys.first)
+  rescue Errno::ENOENT
+    pdf.font('Helvetica')
+  end
   pdf.stroke_color MEDIUM_COLOR
   pdf.line_width(0.5)
   pdf
